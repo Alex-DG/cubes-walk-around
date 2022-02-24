@@ -189,7 +189,7 @@ function start(stream) {
     const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true })
     const floor = new THREE.Mesh(floorGeometry, floorMaterial)
     floor.position.y = -5
-    scene.add(floor)
+    // scene.add(floor)
   }
 
   // Callback: every geolocation update

@@ -1,6 +1,6 @@
 # Minimal example project - AR Experiement: walk throughout a 3D scene with your phone
 
-What I did so far:
+
 - Populate your surrounding with 3D objects ✅
 - Create a gyro camera to see around you all the objects ✅
 - Update the camera position using the device geolocation callabck and the new coordinates returned => I want to be able to walk around the 3D scene and the objects part of it 🚧

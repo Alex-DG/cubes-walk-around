@@ -65,7 +65,7 @@ export const createCubePosition = (cube, camera) => {
     position: object.position.clone(),
   }
 
-  const camDistance = cube.position.distanceTo(camera.position)
+  const camDistance = Math.floor(cube.position.distanceTo(camera.position))
 
   // Create text label
   const label = createCubeLabel(object.position, camDistance)
@@ -79,8 +79,10 @@ export const createCubeLabel = (position, distance) => {
   label.position.copy(position)
   label.position.y = position.y + 1
   label.text = `${distance.toFixed(1)}m`
-  label.fontSize = 0.3
-  label.color = 0x000000
+  label.fontSize = 0.35
+  label.color = 0xffffff
+
+  label.sync()
 
   return label
 }

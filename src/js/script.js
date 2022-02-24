@@ -25,6 +25,9 @@ const color = new THREE.Color()
 let prevTime = performance.now()
 
 const mobile = isMobile()
+const video = document.querySelector('.video')
+// video.offsetWidth
+// video.offsetHeight
 
 // Camera parameters
 const options = {
@@ -32,12 +35,12 @@ const options = {
   video: {
     width: {
       min: 1280,
-      ideal: 1920,
+      ideal: video.offsetWidth,
       max: 2560,
     },
     height: {
       min: 720,
-      ideal: 1080,
+      ideal: video.offesetHeight,
       max: 1440,
     },
     facingMode: !mobile
@@ -201,7 +204,7 @@ function start(stream) {
       const cubeLabel = labels[index]
 
       // Get new distance
-      const newDistance = cube.position.distanceTo(camera.position)
+      const newDistance = Math.floor(cube.position.distanceTo(camera.position))
 
       // Dipose label
       scene.remove(cubeLabel)
@@ -275,7 +278,7 @@ function animate() {
   /**
    * Update label text
    */
-  labels.forEach((label) => label?.sync())
+  // labels.forEach((label) => label?.sync())
 
   prevTime = time
 

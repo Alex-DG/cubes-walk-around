@@ -1,5 +1,7 @@
 import LocalCoordSystem from './localCoordSystem'
 
+const FREQUENCY = 500 // ms
+
 class Device_Geo_Location {
   init({ createWorldObjects, camera, updateWorld }) {
     this.updateWorld = updateWorld
@@ -69,13 +71,14 @@ class Device_Geo_Location {
 
   start() {
     console.log('[ START WATCH POSITION ]')
-    setInterval(() => {
+
+    this.interval = setInterval(() => {
       this.watchID = this.geoLoc.getCurrentPosition(
         this.watchPositionUpdate,
         this.watchPositionError,
         this.options
       )
-    }, 1000)
+    }, FREQUENCY)
   }
 
   bind() {
@@ -86,7 +89,10 @@ class Device_Geo_Location {
 
   dispose() {
     this.geoLoc?.clearWatch(this.watchID)
+    clearInterval(this.interval)
   }
+
+  update() {}
 }
 
 const DeviceGeoLocation = new Device_Geo_Location()

@@ -16,7 +16,7 @@ body {
   z-index: 2;
 }
 
-.container {
+.permissions-container {
   position: absolute;
   top: 0;
   left: 0;
@@ -33,7 +33,7 @@ body {
   align-items: center;
 }
 
-.data-container {
+.debug-container {
   display: none;
 
   position: absolute;

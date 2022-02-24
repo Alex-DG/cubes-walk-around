@@ -25,9 +25,6 @@ const color = new THREE.Color()
 let prevTime = performance.now()
 
 const mobile = isMobile()
-const video = document.querySelector('.video')
-// video.offsetWidth
-// video.offsetHeight
 
 // Camera parameters
 const options = {
@@ -35,12 +32,12 @@ const options = {
   video: {
     width: {
       min: 1280,
-      ideal: video.offsetWidth,
+      ideal: 1920,
       max: 2560,
     },
     height: {
       min: 720,
-      ideal: video.offesetHeight,
+      ideal: 1080,
       max: 1440,
     },
     facingMode: !mobile
@@ -95,7 +92,6 @@ btnAccess.addEventListener('click', function () {
  * @stream - camera feed
  */
 function start(stream) {
-  console.log({ stream })
   /**
    * DOM
    */
@@ -187,8 +183,6 @@ function start(stream) {
       new THREE.Float32BufferAttribute(colorsFloor, 3)
     )
 
-    // console.log({ objects, initCoords: DeviceGeolocation.initCoords })
-
     const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true })
     const floor = new THREE.Mesh(floorGeometry, floorMaterial)
     floor.position.y = -5
@@ -270,17 +264,12 @@ function animate() {
   requestAnimationFrame(animate)
 
   const time = performance.now()
-
   const delta = (time - prevTime) / 1000
+  prevTime = time
 
   controls.update(delta)
 
-  /**
-   * Update label text
-   */
-  // labels.forEach((label) => label?.sync())
-
-  prevTime = time
+  DeviceGeolocation.update()
 
   renderer.render(scene, camera)
 }

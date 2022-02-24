@@ -12,6 +12,7 @@ class Device_Geo_Location {
     this.speedDom = document.getElementById('val1')
 
     this.isInit = false
+    this.isWorking = false
     this.initCoords = undefined
     this.watchID = undefined
     this.speed = 0
@@ -21,7 +22,7 @@ class Device_Geo_Location {
     }
 
     this.bind()
-    this.start()
+    this.updatePosition()
   }
 
   watchPositionError(error) {
@@ -46,39 +47,59 @@ class Device_Geo_Location {
   }
 
   watchPositionUpdate({ coords: { longitude, latitude, speed } }) {
-    this.speed = speed
+    // Only trigger timeout when the previous one is done
+    if (!this.isWorking) {
+      if (this.timeout) clearTimeout(this.timeout)
 
-    // First time: store initial coordiantes
-    if (!this.initCoords) {
-      this.initCoords = {
-        longitude,
-        latitude,
-      }
+      this.isWorking = true
 
-      LocalCoordSystem.setOrigin(latitude, longitude)
-      this.createWorldObjects()
-      this.isInit = true
+      this.timeout = setTimeout(() => {
+        console.log('watchPositionUpdate > update every 500ms')
+        this.speed = speed
+
+        // First time: store initial coordiantes
+        if (!this.initCoords) {
+          this.initCoords = {
+            longitude,
+            latitude,
+          }
+
+          LocalCoordSystem.setOrigin(latitude, longitude)
+          this.createWorldObjects()
+          this.isInit = true
+        }
+
+        // Once setup done: keep updating the camera position
+        if (this.isInit) {
+          LocalCoordSystem.getPosition(
+            this.camera.position,
+            latitude,
+            longitude
+          )
+          this.updateWorld()
+        }
+
+        this.domUpdate()
+
+        this.isWorking = false
+      }, FREQUENCY)
     }
-
-    // Once setup done: keep updating the camera position
-    if (this.isInit) {
-      LocalCoordSystem.getPosition(this.camera.position, latitude, longitude)
-      this.updateWorld()
-    }
-
-    this.domUpdate()
   }
 
-  start() {
-    console.log('[ START WATCH POSITION ]')
+  updatePosition() {
+    this.watchID = this.geoLoc.getCurrentPosition(
+      this.watchPositionUpdate,
+      this.watchPositionError,
+      this.options
+    )
 
-    this.interval = setInterval(() => {
-      this.watchID = this.geoLoc.getCurrentPosition(
-        this.watchPositionUpdate,
-        this.watchPositionError,
-        this.options
-      )
-    }, FREQUENCY)
+    // this.interval = setInterval(() => {
+    //   this.watchID = this.geoLoc.getCurrentPosition(
+    //     this.watchPositionUpdate,
+    //     this.watchPositionError,
+    //     this.options
+    //   )
+    // }, FREQUENCY)
   }
 
   bind() {
@@ -89,10 +110,13 @@ class Device_Geo_Location {
 
   dispose() {
     this.geoLoc?.clearWatch(this.watchID)
-    clearInterval(this.interval)
+    // clearInterval(this.interval)
+    clearTimeout(this.timeout)
   }
 
-  update() {}
+  update() {
+    this.updatePosition()
+  }
 }
 
 const DeviceGeoLocation = new Device_Geo_Location()

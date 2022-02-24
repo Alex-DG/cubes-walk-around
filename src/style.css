@@ -54,8 +54,13 @@ body {
 }
 
 .video {
+  position: fixed;
+  top: -10px;
+  left: 0;
+
   width: 100%;
   height: 100vh;
+
   background: rgba(0, 0, 0, 0.2);
 }
 

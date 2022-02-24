@@ -1,4 +1,4 @@
-class LocalCoordSystem {
+class Local_Coord_System {
   constructor() {
     this.origin = [0, 0] // latitude, longitude of worldspace (0,0,0)
     this.scale = [1, 1] // meters per degree latitude, meters per degree longitude
@@ -25,4 +25,5 @@ class LocalCoordSystem {
   }
 }
 
+const LocalCoordSystem = new Local_Coord_System()
 export default LocalCoordSystem

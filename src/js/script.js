@@ -9,7 +9,7 @@ import { hideContainer } from './utils'
 import { createCubeLabel, createCubePosition } from './cube.js'
 
 import DeviceGeolocation from './deviceGeolocation'
-import LocalCoordSystem from './LocalCoordSystem'
+import LocalCoordSystem from './localCoordSystem'
 
 /**
  * BASE
@@ -192,13 +192,10 @@ function start() {
   /**
    * Init. watch position: geolocation sensor start
    */
-  const localCoordSystem = new LocalCoordSystem()
-
   DeviceGeolocation.init({
     createWorldObjects,
     camera,
     updateWorld,
-    localCoordSystem,
   })
 
   /**

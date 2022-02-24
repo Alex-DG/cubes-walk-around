@@ -3,7 +3,7 @@ import * as THREE from 'three'
 console.log('script!')
 
 import '../style.css'
-// import DeviceOrientationControls from './controls'
+import DeviceOrientationControls from './controls'
 
 import { cameraFeed, hideContainer, showData } from './dom.js'
 import { createCubeLabel, createCubePosition } from './cube.js'

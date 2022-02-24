@@ -1,9 +1,9 @@
 # Minimal example project
 
 What I did so far:
-~Populate your surrounding with 3D objects ✅
-~Create a gyro camera to see around you all the objects ✅
-~Update the camera position using the accelerometer from you phone to to walk around the 3D scene and objects
+- Populate your surrounding with 3D objects ✅
+- Create a gyro camera to see around you all the objects ✅
+- Update the camera position using the accelerometer from you phone to to walk around the 3D scene and objects
 
 - In my scene I have X number of cubes placed around me given a distance and an angle as follow:
 

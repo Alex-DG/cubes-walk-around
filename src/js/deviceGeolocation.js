@@ -43,7 +43,9 @@ class Device_Geo_Location {
   }
 
   domUpdate() {
-    this.speedDom.innerText = `speed: ${this.speed?.toFixed(4)}m/s`
+    if (this.speedDom && this.speed) {
+      this.speedDom.innerText = `speed: ${this.speed.toFixed(4)}m/s`
+    }
   }
 
   watchPositionUpdate({ coords: { longitude, latitude, speed } }) {
@@ -109,9 +111,9 @@ class Device_Geo_Location {
   }
 
   dispose() {
-    this.geoLoc?.clearWatch(this.watchID)
+    if (this.geoLoc) this.geoLoc.clearWatch(this.watchID)
+    if (this.timeout) clearTimeout(this.timeout)
     // clearInterval(this.interval)
-    clearTimeout(this.timeout)
   }
 
   update() {

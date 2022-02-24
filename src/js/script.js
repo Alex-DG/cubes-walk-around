@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 
-import { Text } from 'troika-three-text'
+console.log('script!')
 
 import '../style.css'
-import DeviceOrientationControls from './controls'
+// import DeviceOrientationControls from './controls'
 
 import { cameraFeed, hideContainer, showData } from './dom.js'
 import { createCubeLabel, createCubePosition } from './cube.js'
@@ -53,6 +53,7 @@ const options = {
  */
 const init = () => {
   navigator.mediaDevices.getUserMedia(options).then((stream) => {
+    console.log('stream', { stream })
     start(stream)
     animate()
   })
@@ -62,7 +63,8 @@ const init = () => {
  * Handle permissions ios.............
  */
 const btnAccess = document.getElementById('btn-access')
-btnAccess.addEventListener('click', function () {
+btnAccess.addEventListener('click', () => {
+  console.log('access!')
   if (typeof DeviceMotionEvent.requestPermission === 'function') {
     DeviceMotionEvent.requestPermission()
       .then((permissionState) => {

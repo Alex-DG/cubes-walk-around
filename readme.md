@@ -1,4 +1,4 @@
-# Minimal example project - AR Experiement: walk throughout a 3D scene with your phone
+# Minimal example project - AR Experiment: walk throughout a 3D scene with your phone
 
 
 - Populate your surrounding with 3D objects ✅

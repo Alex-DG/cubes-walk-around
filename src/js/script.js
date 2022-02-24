@@ -9,6 +9,7 @@ import { cameraFeed, hideContainer, showData } from './dom.js'
 import { createCubeLabel, createCubePosition } from './cube.js'
 
 import DeviceGeolocation from './deviceGeolocation'
+import { isMobile } from './utils'
 
 /**
  * BASE
@@ -22,6 +23,8 @@ const vertex = new THREE.Vector3()
 const color = new THREE.Color()
 
 let prevTime = performance.now()
+
+const mobile = isMobile()
 
 // Camera parameters
 const options = {
@@ -37,9 +40,11 @@ const options = {
       ideal: 1080,
       max: 1440,
     },
-    facingMode: {
-      exact: 'environment',
-    },
+    facingMode: !mobile
+      ? null
+      : {
+          exact: 'environment',
+        },
   },
 }
 

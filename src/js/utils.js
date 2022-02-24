@@ -12,6 +12,12 @@ export const isIOS = () => {
   return isIOS
 }
 
+export const isMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+}
+
 export const coordsToVector3 = (lng, lat) => {
   const out = new THREE.Vector3()
 

@@ -1,9 +1,8 @@
-import LocalCoordSystem from './LocalCoordSystem'
-
 class Device_Geo_Location {
-  init({ createWorldObjects, camera, updateWorld }) {
+  init({ createWorldObjects, camera, updateWorld, localCoordSystem }) {
     this.updateWorld = updateWorld
     this.createWorldObjects = createWorldObjects
+    this.localCoordSystem = localCoordSystem
     this.camera = camera
 
     this.isInit = false
@@ -43,14 +42,18 @@ class Device_Geo_Location {
         latitude,
       }
 
-      LocalCoordSystem.setOrigin(latitude, longitude)
+      this.localCoordSystem.setOrigin(latitude, longitude)
       this.createWorldObjects()
       this.isInit = true
     }
 
     // Once setup done: keep updating the camera position
     if (this.isInit) {
-      LocalCoordSystem.getPosition(this.camera.position, latitude, longitude)
+      this.localCoordSystem.getPosition(
+        this.camera.position,
+        latitude,
+        longitude
+      )
       this.updateWorld()
     }
   }

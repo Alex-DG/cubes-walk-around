@@ -6,9 +6,13 @@ class Device_Geo_Location {
     this.createWorldObjects = createWorldObjects
     this.camera = camera
 
+    // Dom
+    this.speedDom = document.getElementById('val1')
+
     this.isInit = false
     this.initCoords = undefined
     this.watchID = undefined
+    this.speed = 0
     this.geoLoc = navigator.geolocation
     this.options = {
       enableHighAccuracy: true,
@@ -35,7 +39,13 @@ class Device_Geo_Location {
     }
   }
 
-  watchPositionUpdate({ coords: { longitude, latitude } }) {
+  domUpdate() {
+    this.speedDom.innerText = `speed: ${this.speed?.toFixed(4)}m/s`
+  }
+
+  watchPositionUpdate({ coords: { longitude, latitude, speed } }) {
+    this.speed = speed
+
     // First time: store initial coordiantes
     if (!this.initCoords) {
       this.initCoords = {
@@ -53,6 +63,8 @@ class Device_Geo_Location {
       LocalCoordSystem.getPosition(this.camera.position, latitude, longitude)
       this.updateWorld()
     }
+
+    this.domUpdate()
   }
 
   start() {
@@ -69,6 +81,7 @@ class Device_Geo_Location {
   bind() {
     this.watchPositionUpdate = this.watchPositionUpdate.bind(this)
     this.watchPositionError = this.watchPositionError.bind(this)
+    this.domUpdate = this.domUpdate.bind(this)
   }
 
   dispose() {

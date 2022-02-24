@@ -12,16 +12,6 @@ export const isIOS = () => {
   return isIOS
 }
 
-export const hideContainer = () => {
-  const container = document.querySelector('.container')
-  container.style.display = 'none'
-}
-
-export const showData = () => {
-  const container = document.querySelector('.data-container')
-  container.style.display = 'flex'
-}
-
 export const coordsToVector3 = (lng, lat) => {
   const out = new THREE.Vector3()
 

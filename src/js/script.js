@@ -5,11 +5,10 @@ import { Text } from 'troika-three-text'
 import '../style.css'
 import DeviceOrientationControls from './controls'
 
-import { hideContainer } from './utils'
+import { cameraFeed, hideContainer, showData } from './dom.js'
 import { createCubeLabel, createCubePosition } from './cube.js'
 
 import DeviceGeolocation from './deviceGeolocation'
-import LocalCoordSystem from './localCoordSystem'
 
 /**
  * BASE
@@ -24,12 +23,34 @@ const color = new THREE.Color()
 
 let prevTime = performance.now()
 
+// Camera parameters
+const options = {
+  audio: false,
+  video: {
+    width: {
+      min: 1280,
+      ideal: 1920,
+      max: 2560,
+    },
+    height: {
+      min: 720,
+      ideal: 1080,
+      max: 1440,
+    },
+    facingMode: {
+      exact: 'environment',
+    },
+  },
+}
+
 /**
  * INIT EXPERIENCE
  */
 const init = () => {
-  start()
-  animate()
+  navigator.mediaDevices.getUserMedia(options).then((stream) => {
+    start(stream)
+    animate()
+  })
 }
 
 /**
@@ -62,12 +83,17 @@ btnAccess.addEventListener('click', function () {
 
 /**
  * START EXPERIENCE: create 3d world
+ *
+ * @stream - camera feed
  */
-function start() {
+function start(stream) {
+  console.log({ stream })
   /**
-   * DOM: landing screen
+   * DOM
    */
   hideContainer()
+  showData()
+  cameraFeed(stream)
 
   /**
    * CAMERA
@@ -81,7 +107,7 @@ function start() {
   camera.position.y = 10
 
   scene = new THREE.Scene()
-  scene.background = new THREE.Color(0xffffff)
+  // scene.background = new THREE.Color(0xffffff)
   scene.fog = new THREE.Fog(0xffffff, 0, 750)
 
   const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75)
@@ -214,7 +240,8 @@ function start() {
    * RENDERER
    */
   const canvas = document.querySelector('canvas.webgl')
-  renderer = new THREE.WebGLRenderer({ antialias: true, canvas })
+  renderer = new THREE.WebGLRenderer({ antialias: true, canvas, alpha: true })
+
   renderer.setPixelRatio(window.devicePixelRatio)
   renderer.setSize(window.innerWidth, window.innerHeight)
 

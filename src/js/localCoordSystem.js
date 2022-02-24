@@ -19,6 +19,7 @@ class Local_Coord_System {
   getPosition(outVec, latitude, longitude, altitude = 0) {
     const dLat = latitude - this.origin[0]
     const dLon = longitude - this.origin[1]
+
     outVec.z = -this.scale[0] * dLat
     outVec.x = this.scale[1] * dLon
     outVec.y = altitude

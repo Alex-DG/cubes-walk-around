@@ -1,6 +1,6 @@
 import LocalCoordSystem from './localCoordSystem'
 
-const FREQUENCY = 500 // ms
+const FREQUENCY = 1000 // ms
 
 class Device_Geo_Location {
   init({ createWorldObjects, camera, updateWorld }) {
@@ -43,65 +43,88 @@ class Device_Geo_Location {
   }
 
   domUpdate() {
-    if (this.speedDom && this.speed) {
-      this.speedDom.innerText = `speed: ${this.speed.toFixed(4)}m/s`
+    if (this.speedDom) {
+      const s = this.speed || 0
+      this.speedDom.innerText = `speed: ${s.toFixed(4)}m/s`
     }
   }
 
   watchPositionUpdate({ coords: { longitude, latitude, speed } }) {
-    // Only trigger timeout when the previous one is done
-    if (!this.isWorking) {
-      if (this.timeout) clearTimeout(this.timeout)
+    this.speed = speed
 
-      this.isWorking = true
+    // First time: store initial coordiantes
+    if (!this.initCoords) {
+      this.initCoords = {
+        longitude,
+        latitude,
+      }
 
-      this.timeout = setTimeout(() => {
-        console.log('watchPositionUpdate > update every 500ms')
-        this.speed = speed
-
-        // First time: store initial coordiantes
-        if (!this.initCoords) {
-          this.initCoords = {
-            longitude,
-            latitude,
-          }
-
-          LocalCoordSystem.setOrigin(latitude, longitude)
-          this.createWorldObjects()
-          this.isInit = true
-        }
-
-        // Once setup done: keep updating the camera position
-        if (this.isInit) {
-          LocalCoordSystem.getPosition(
-            this.camera.position,
-            latitude,
-            longitude
-          )
-          this.updateWorld()
-        }
-
-        this.domUpdate()
-
-        this.isWorking = false
-      }, FREQUENCY)
+      LocalCoordSystem.setOrigin(latitude, longitude)
+      this.createWorldObjects()
+      this.isInit = true
     }
+
+    // Once setup done: keep updating the camera position
+    if (this.isInit) {
+      LocalCoordSystem.getPosition(this.camera.position, latitude, longitude)
+      this.updateWorld()
+    }
+
+    this.domUpdate()
+
+    // Only trigger timeout when the previous one is done
+    // if (!this.isWorking) {
+    //   if (this.timeout) clearTimeout(this.timeout)
+
+    //   this.isWorking = true
+
+    //   this.timeout = setTimeout(() => {
+    //     console.log('watchPositionUpdate > update every 500ms')
+    //     this.speed = speed
+
+    //     // First time: store initial coordiantes
+    //     if (!this.initCoords) {
+    //       this.initCoords = {
+    //         longitude,
+    //         latitude,
+    //       }
+
+    //       LocalCoordSystem.setOrigin(latitude, longitude)
+    //       this.createWorldObjects()
+    //       this.isInit = true
+    //     }
+
+    //     // Once setup done: keep updating the camera position
+    //     if (this.isInit) {
+    //       LocalCoordSystem.getPosition(
+    //         this.camera.position,
+    //         latitude,
+    //         longitude
+    //       )
+    //       this.updateWorld()
+    //     }
+
+    //     this.domUpdate()
+
+    //     this.isWorking = false
+    //   }, FREQUENCY)
+    // }
   }
 
   updatePosition() {
-    this.watchID = this.geoLoc.getCurrentPosition(
-      this.watchPositionUpdate,
-      this.watchPositionError,
-      this.options
-    )
+    // this.watchID = this.geoLoc.getCurrentPosition(
+    //   this.watchPositionUpdate,
+    //   this.watchPositionError,
+    //   this.options
+    // )
 
-    // this.interval = setInterval(() => {
-    //   this.watchID = this.geoLoc.getCurrentPosition(
-    //     this.watchPositionUpdate,
-    //     this.watchPositionError,
-    //     this.options
-    //   )
-    // }, FREQUENCY)
+    this.interval = setInterval(() => {
+      this.watchID = this.geoLoc.getCurrentPosition(
+        this.watchPositionUpdate,
+        this.watchPositionError,
+        this.options
+      )
+    }, FREQUENCY)
   }
 
   bind() {
@@ -117,7 +140,7 @@ class Device_Geo_Location {
   }
 
   update() {
-    this.updatePosition()
+    // this.updatePosition()
   }
 }
 

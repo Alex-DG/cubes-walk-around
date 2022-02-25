@@ -1,7 +1,5 @@
 import * as THREE from 'three'
 
-console.log('script!')
-
 import '../style.css'
 import DeviceOrientationControls from './controls'
 
@@ -25,21 +23,16 @@ const color = new THREE.Color()
 let prevTime = performance.now()
 
 const mobile = isMobile()
+const body = document.querySelector('body')
+
+console.log({ h: body.clientHeight, w: body.clientWidth })
 
 // Camera parameters
 const options = {
   audio: false,
   video: {
-    width: {
-      min: 1280,
-      ideal: 1920,
-      max: 2560,
-    },
-    height: {
-      min: 720,
-      ideal: 1080,
-      max: 1440,
-    },
+    width: { min: 1024, ideal: 1280, max: 1920 },
+    height: { min: 576, ideal: 700, max: 1080 },
     facingMode: !mobile
       ? null
       : {
@@ -53,7 +46,6 @@ const options = {
  */
 const init = () => {
   navigator.mediaDevices.getUserMedia(options).then((stream) => {
-    console.log('stream', { stream })
     start(stream)
     animate()
   })
@@ -64,7 +56,6 @@ const init = () => {
  */
 const btnAccess = document.getElementById('btn-access')
 btnAccess.addEventListener('click', () => {
-  console.log('access!')
   if (typeof DeviceMotionEvent.requestPermission === 'function') {
     DeviceMotionEvent.requestPermission()
       .then((permissionState) => {

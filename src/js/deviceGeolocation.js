@@ -117,6 +117,12 @@ class Device_Geo_Location {
     //   this.watchPositionError,
     //   this.options
     // )
+    const queryString = window.location.search
+    const urlParams = new URLSearchParams(queryString)
+    const fParams = urlParams.get('f')
+    const frequency = fParams ? Number(fParams) : FREQUENCY
+
+    console.log({ frequency })
 
     this.interval = setInterval(() => {
       this.watchID = this.geoLoc.getCurrentPosition(
@@ -124,7 +130,7 @@ class Device_Geo_Location {
         this.watchPositionError,
         this.options
       )
-    }, FREQUENCY)
+    }, frequency)
   }
 
   bind() {

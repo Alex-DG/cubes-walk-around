@@ -25,7 +25,7 @@ let prevTime = performance.now()
 const mobile = isMobile()
 const body = document.querySelector('body')
 
-console.log({ h: body.clientHeight, w: body.clientWidth })
+// console.log({ h: body.clientHeight, w: body.clientWidth })
 
 // Camera parameters
 const options = {

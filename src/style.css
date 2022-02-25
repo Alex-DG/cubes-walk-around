@@ -49,6 +49,7 @@ body {
   border-radius: 0.2em;
 
   flex-direction: column;
+  gap: 0.1em;
   /* justify-content: flex-start;
   align-items: center; */
 }

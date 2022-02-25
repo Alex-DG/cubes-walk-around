@@ -11,24 +11,26 @@ class Device_Geo_Location {
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString)
     const fParams = urlParams.get('f')
-    this.frequency = fParams ? Number(fParams) : DEFAULT_F
+    const timeout = (fParams ? Number(fParams) : DEFAULT_F) - 100
 
     // Dom
-    this.speedDom = document.getElementById('val1')
+    this.updateDom = document.getElementById('val1') // Frequency defined for every update/interval
+    this.speedDom = document.getElementById('val2')
+    this.accDom = document.getElementById('val3') // accuracy
 
     this.isInit = false
     this.isWorking = false
     this.initCoords = undefined
     this.watchID = undefined
     this.speed = 0
+    this.accuracy = 0
+    this.frequency = timeout
     this.geoLoc = navigator.geolocation
     this.options = {
       enableHighAccuracy: true,
-      timeout: this.frequency - 100,
       maximumAge: 0,
+      timeout,
     }
-
-    console.log('Device_Geo_Location', this.options)
 
     this.bind()
     this.updatePosition()
@@ -52,14 +54,19 @@ class Device_Geo_Location {
   }
 
   domUpdate() {
-    if (this.speedDom) {
-      const s = this.speed || 0
-      this.speedDom.innerText = `speed: ${s.toFixed(4)}m/s`
-    }
+    const f = this.frequency || 0
+    this.updateDom.innerText = `update: ${f}ms`
+
+    const s = this.speed || 0
+    this.speedDom.innerText = `speed: ${s.toFixed(4)}m/s`
+
+    const a = this.accuracy || 0
+    this.accDom.innerText = `accuracy: ${a.toFixed(2)}m`
   }
 
-  watchPositionUpdate({ coords: { longitude, latitude, speed } }) {
+  watchPositionUpdate({ coords: { longitude, latitude, speed, accuracy } }) {
     this.speed = speed
+    this.accuracy = accuracy
 
     // First time: store initial coordiantes
     if (!this.initCoords) {
@@ -100,6 +107,7 @@ class Device_Geo_Location {
   }
 
   bind() {
+    this.domUpdate = this.domUpdate.bind(this)
     this.updatePosition = this.updatePosition.bind(this)
     this.watchPositionUpdate = this.watchPositionUpdate.bind(this)
     this.watchPositionError = this.watchPositionError.bind(this)

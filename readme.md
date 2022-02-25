@@ -1,4 +1,4 @@
-# AR Experiment with Three.js: walk throughout a 3D scene with your phone
+# AR Experiment with Three.js: walk through a 3D scene with your phone
 
 
 - Populate your surrounding with 3D objects ✅

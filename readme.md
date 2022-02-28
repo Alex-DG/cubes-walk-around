@@ -12,7 +12,7 @@
 
 - Finally I would like to use the device geolocation update to apply a new position to my perspective camera while I'm walking towards or away from a cube so I could walk around the 3D scene and all the objects part of it: [deviceGeoLocation](https://github.com/Alex-DG/cubes-walk-around/blob/main/src/js/deviceGeolocation.js)
 
-The redresh frequency can by updated from the url and a `f` parameter as follow:
+The refresh frequency can by updated from the url and a `f` parameter as follow:
 
 ```
 https://cubes-walk-around.vercel.app/?f=400

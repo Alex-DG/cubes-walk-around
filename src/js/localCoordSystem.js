@@ -20,9 +20,9 @@ class Local_Coord_System {
     const dLat = latitude - this.origin[0]
     const dLon = longitude - this.origin[1]
 
-    outVec.z = Math.floor(-this.scale[0] * dLat)
-    // outVec.x = Math.floor(this.scale[1] * dLon)
-    outVec.y = Math.floor(altitude)
+    outVec.z = -this.scale[0] * dLat
+    outVec.x = this.scale[1] * dLon
+    outVec.y = altitude
   }
 }
 

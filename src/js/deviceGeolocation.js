@@ -16,7 +16,7 @@ class Device_Geo_Location {
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString)
     const fParams = urlParams.get('f')
-    const timeout = (fParams ? Number(fParams) : DEFAULT_F) - 100
+    const timeout = fParams ? Number(fParams) : DEFAULT_F
 
     // Dom
     this.updateDom = document.getElementById('val1') // Frequency defined for every update/interval

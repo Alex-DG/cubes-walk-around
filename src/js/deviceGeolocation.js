@@ -22,6 +22,8 @@ class Device_Geo_Location {
     this.updateDom = document.getElementById('val1') // Frequency defined for every update/interval
     this.speedDom = document.getElementById('val2')
     this.accDom = document.getElementById('val3') // accuracy
+    this.latDom = document.getElementById('val4') // latitude
+    this.lngDom = document.getElementById('val5') // longitude
 
     this.isInit = false
     this.isWorking = false
@@ -29,12 +31,14 @@ class Device_Geo_Location {
     this.watchID = undefined
     this.speed = 0
     this.accuracy = 0
+    this.longitude = 0
+    this.latitude = 0
     this.frequency = timeout
     this.geoLoc = navigator.geolocation
     this.options = {
       enableHighAccuracy: true,
       maximumAge: 0,
-      timeout,
+      // timeout,
     }
 
     this.bind()
@@ -67,11 +71,26 @@ class Device_Geo_Location {
 
     const a = this.accuracy || 0
     this.accDom.innerText = `accuracy: ${a.toFixed(2)}m`
+
+    const lat = this.latitude || 0
+    this.latDom.innerText = `lat: ${lat.toFixed(5)}°`
+
+    const lng = this.longitude || 0
+    this.lngDom.innerText = `lng: ${lng.toFixed(5)}°`
   }
 
-  watchPositionUpdate({ coords: { longitude, latitude, speed, accuracy } }) {
+  watchPositionUpdate(data) {
+    console.log({ data })
+    console.time('time')
+    const {
+      coords: { longitude, latitude, speed, accuracy },
+    } = data
     this.speed = speed
     this.accuracy = accuracy
+    this.longitude = longitude
+    this.latitude = latitude
+
+    console.log({ longitude, latitude })
 
     // First time: store initial coordiantes
     if (!this.initCoords) {
@@ -130,6 +149,12 @@ class Device_Geo_Location {
         this.options
       )
     }, frequency)
+
+    // this.watchID = this.geoLoc.watchPosition(
+    //   this.watchPositionUpdate,
+    //   this.watchPositionError,
+    //   this.options
+    // )
   }
 
   bind() {

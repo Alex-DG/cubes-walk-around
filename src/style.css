@@ -8,6 +8,9 @@ body {
   overflow: hidden;
 }
 
+/**
+ * Canvas
+ */
 .webgl {
   position: fixed;
   top: 0;
@@ -16,6 +19,9 @@ body {
   z-index: 2;
 }
 
+/**
+  * Permissions 
+  */
 .permissions-container {
   position: absolute;
   top: 0;
@@ -33,6 +39,9 @@ body {
   align-items: center;
 }
 
+/**
+  * debug
+  */
 .debug-container {
   display: none;
 
@@ -54,6 +63,9 @@ body {
   align-items: center; */
 }
 
+/**
+  * Background video
+  */
 .video {
   /* position: fixed; */
   top: 0;

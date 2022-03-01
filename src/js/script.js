@@ -224,11 +224,7 @@ function start(stream) {
    */
   controls = new DeviceOrientationControls({
     camera,
-    world: {
-      cubes: objects,
-      labels,
-      scene,
-    },
+    scene,
   })
 
   /**

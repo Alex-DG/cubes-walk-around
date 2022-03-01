@@ -131,10 +131,6 @@ class DeviceOrientationControls {
     // use webkitCompassHeading to set camera forward direction to magnetic North
     if (this.deviceOrientation) {
       console.log('ios!')
-      console.log({
-        deviceOrientation: this.deviceOrientation,
-        heading: this.deviceOrientation.webkitCompassHeading,
-      })
 
       this.camera.rotation.y =
         DEG2RAD * -this.deviceOrientation.webkitCompassHeading
@@ -146,12 +142,12 @@ class DeviceOrientationControls {
     // }
 
     // By how much are we off from north
-    const delta = -(360 - currHeading)
-    const deltaRad = THREE.MathUtils.degToRad(delta)
+    // const delta = -(360 - currHeading)
+    // const deltaRad = THREE.MathUtils.degToRad(delta)
 
     // Align the scene rotation with the real world north orientation
-    this.scene.rotation.y = deltaRad
-    this.scene.updateMatrixWorld()
+    // this.scene.rotation.y = deltaRad
+    // this.scene.updateMatrixWorld()
     console.log('scene orientation')
 
     // else {

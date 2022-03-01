@@ -1,12 +1,7 @@
 import * as THREE from 'three'
-import {
-  calculateBearingBetweenPoints,
-  calculateDistanceBetweenPoints,
-  coordsToVector3,
-  getRandomCoords,
-} from './utils'
+import { isIOS } from './utils'
 
-import { Text } from 'troika-three-text'
+const DEG2RAD = Math.PI / 180
 
 class DeviceOrientationControls {
   geoLoc
@@ -109,129 +104,6 @@ class DeviceOrientationControls {
   })()
 
   /**
-   * CUBES' POSITION UPDATES BASED ON SENSOR DATA
-   */
-  // watchPositionError(error) {
-  //   switch (error.code) {
-  //     case error.PERMISSION_DENIED:
-  //       console.error('User denied the request for Geolocation.')
-  //       break
-  //     case error.POSITION_UNAVAILABLE:
-  //       console.error('Location information is unavailable.')
-  //       break
-  //     case error.TIMEOUT:
-  //       console.error('The request to get user location timed out.')
-  //       break
-  //     case error.UNKNOWN_ERROR:
-  //       console.error('An unknown error occurred.')
-  //       break
-  //   }
-  // }
-
-  // onPositionUpdate(data) {
-  //   const {
-  //     coords: { longitude, latitude },
-  //   } = data
-
-  //   // set initial position coordinates lat/long <==> center of the scene (your position)
-  //   if (!this.initCoords) {
-  //     this.initCoords = {
-  //       longitude,
-  //       latitude,
-  //     }
-  //   }
-
-  //   // Current coordinates
-  //   this.currentCoords = {
-  //     longitude,
-  //     latitude,
-  //   }
-
-  //   const scene = this.world.scene
-
-  //   // Update cubes
-  //   const tempLabels = []
-  //   this.world.cubes.forEach((cube, index) => {
-  //     const { position, distance, angleDeg, angleRad, coords } = cube.userData // cube data stored on create `randomCube.js`
-
-  //     // TURF - new angle calculation
-  //     const bearing = calculateBearingBetweenPoints(
-  //       this.currentCoords, // i.e: { latitude: -37.9136, longitude: 144.8631 }
-  //       coords // i.e: { latitude: -37.8136, longitude: 144.9631 },
-  //     )
-  //     // TURF - new distance calculation
-  //     const newDistance = calculateDistanceBetweenPoints(
-  //       this.currentCoords,
-  //       coords
-  //     )
-
-  //     const normalizedDistance = new THREE.Vector3()
-  //     const newPosition = new THREE.Vector3()
-
-  //     normalizedDistance.copy(
-  //       new THREE.Vector3(position.x, position.y, newDistance)
-  //     )
-  //     newPosition.copy(
-  //       normalizedDistance.applyAxisAngle(new THREE.Vector3(0, 1, 0), bearing)
-  //     )
-
-  //     cube.position.copy(newPosition) // or later: cube.position.lerp(newPosition, 0.2)
-
-  //     // Update cube stored distance
-  //     cube.userData.distance = newDistance
-
-  //     // Clear label
-  //     const label = this.world.labels[index] // existing cube label
-  //     scene.remove(label)
-  //     label.dispose()
-
-  //     // Create new label
-  //     const l = new Text()
-  //     l.position.copy(newPosition)
-  //     l.position.y += 2
-  //     l.text = `${newDistance.toFixed(1)}m`
-  //     l.fontSize = 0.5
-  //     l.color = 0x000000
-
-  //     l.lookAt(this.camera.position)
-
-  //     // Add new label to scene
-  //     scene.add(l)
-  //     tempLabels.push(l)
-  //   })
-
-  //   // Update world labels..
-  //   this.world.labels = tempLabels
-
-  //   // const distDom = document.getElementById('val1')
-  //   // distDom.innerText = `traveled: ${distance.toFixed(2)}m`
-  // }
-
-  // watchPosition() {
-  //   this.geoLoc = navigator.geolocation
-
-  //   const options = {
-  //     enableHighAccuracy: true,
-  //     // timeout
-  //     // age
-  //   }
-
-  //   setInterval(() => {
-  //     this.watchID = navigator.geolocation.getCurrentPosition(
-  //       this.onPositionUpdate,
-  //       this.watchPositionError,
-  //       options
-  //     )
-  //   }, 1000)
-
-  //   // this.watchID = navigator.geolocation.watchPosition(
-  //   //   this.onPositionUpdate,
-  //   //   this.watchPositionError,
-  //   //   options
-  //   // )
-  // }
-
-  /**
    * FRAME LOOP
    */
   update(deltaTime) {
@@ -253,7 +125,25 @@ class DeviceOrientationControls {
       ? THREE.MathUtils.degToRad(this.screenOrientation)
       : 0 // O
 
-    this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
+    // use webkitCompassHeading to set camera forward direction to magnetic North
+    if (this.deviceOrientation) {
+      console.log({
+        deviceOrientation: this.deviceOrientation,
+        heading: this.deviceOrientation.webkitCompassHeading,
+      })
+
+      this.camera.rotation.y =
+        DEG2RAD * -this.deviceOrientation.webkitCompassHeading
+    }
+    // else {
+    //   this.setObjectQuaternion(
+    //     this.camera.quaternion,
+    //     alpha,
+    //     beta,
+    //     gamma,
+    //     orient
+    //   )
+    // }
 
     this.alphaDeg = this.deviceOrientation?.alpha || 0
     this.alphaRad = alpha

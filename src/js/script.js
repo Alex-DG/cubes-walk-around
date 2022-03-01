@@ -122,7 +122,7 @@ function start(stream) {
       new THREE.BoxGeometry(1, 1, 1),
       new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
     )
-    northCube.position.set(0, 0, 10)
+    northCube.position.set(0, 0, -10)
     scene.add(northCube)
 
     const worldCube = new THREE.Mesh(

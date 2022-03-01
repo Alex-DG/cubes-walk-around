@@ -143,10 +143,10 @@ class DeviceOrientationControls {
       currHeading = alpha
     }
 
-    // const delta = -(360 - currHeading)
-    // const deltaRad = THREE.MathUtils.degToRad(delta)
-    // this.scene.rotation.y = deltaRad
-    // this.scene.updateMatrixWorld()
+    const delta = -(360 - currHeading)
+    const deltaRad = THREE.MathUtils.degToRad(delta)
+    this.scene.rotation.y = deltaRad
+    this.scene.updateMatrixWorld()
 
     // else {
     //   this.setObjectQuaternion(

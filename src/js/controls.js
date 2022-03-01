@@ -143,8 +143,11 @@ class DeviceOrientationControls {
       currHeading = alpha
     }
 
+    // By how much are we off from north
     const delta = -(360 - currHeading)
     const deltaRad = THREE.MathUtils.degToRad(delta)
+
+    // Align the scene rotation with the real world north orientation
     this.scene.rotation.y = deltaRad
     this.scene.updateMatrixWorld()
 

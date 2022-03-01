@@ -134,7 +134,7 @@ class DeviceOrientationControls {
 
       this.camera.rotation.y =
         DEG2RAD * -this.deviceOrientation.webkitCompassHeading
-      currHeading = this.deviceOrientation.webkitCompassHeading
+      // currHeading = this.deviceOrientation.webkitCompassHeading
     }
     // else {
     //   this.camera.rotation.y = alpha

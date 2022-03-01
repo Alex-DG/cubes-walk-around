@@ -39,10 +39,6 @@ class DeviceOrientationControls {
       this.onDeviceOrientationChangeEvent.bind(this)
 
     this.onDeviceMotionChangeEvent = this.onDeviceMotionChangeEvent.bind(this)
-
-    // this.onPositionUpdate = this.onPositionUpdate.bind(this)
-
-    // this.watchPositionError = this.watchPositionError.bind(this)
   }
 
   connect() {
@@ -126,39 +122,14 @@ class DeviceOrientationControls {
       ? THREE.MathUtils.degToRad(this.screenOrientation)
       : 0 // O
 
-    let currHeading = 0
+    // don't use device relative rotations
+    //this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
 
     // use webkitCompassHeading to set camera forward direction to magnetic North
     if (this.deviceOrientation) {
-      console.log('ios!')
-
       this.camera.rotation.y =
         DEG2RAD * -this.deviceOrientation.webkitCompassHeading
-      // currHeading = this.deviceOrientation.webkitCompassHeading
     }
-    // else {
-    //   this.camera.rotation.y = alpha
-    //   currHeading = alpha
-    // }
-
-    // By how much are we off from north
-    // const delta = -(360 - currHeading)
-    // const deltaRad = THREE.MathUtils.degToRad(delta)
-
-    // Align the scene rotation with the real world north orientation
-    // this.scene.rotation.y = deltaRad
-    // this.scene.updateMatrixWorld()
-    console.log('scene orientation')
-
-    // else {
-    //   this.setObjectQuaternion(
-    //     this.camera.quaternion,
-    //     alpha,
-    //     beta,
-    //     gamma,
-    //     orient
-    //   )
-    // }
 
     this.alphaDeg = this.deviceOrientation?.alpha || 0
     this.alphaRad = alpha

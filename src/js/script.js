@@ -144,6 +144,8 @@ function start(stream) {
       label.lookAt(camera.position)
     })
 
+    console.log('cube placed')
+
     /**
      * FLOOR
      */

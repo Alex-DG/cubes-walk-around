@@ -25,7 +25,7 @@ class DeviceOrientationControls {
     this.camera = camera
     this.scene = scene
 
-    this.camera.rotation.reorder('YXZ')
+    // this.camera.rotation.reorder('YXZ')
 
     this.bind()
     this.connect()
@@ -129,7 +129,8 @@ class DeviceOrientationControls {
     let currHeading = 0
 
     // use webkitCompassHeading to set camera forward direction to magnetic North
-    if (this.deviceOrientation?.webkitCompassHeading === 0) {
+    if (this.deviceOrientation) {
+      console.log('ios!')
       console.log({
         deviceOrientation: this.deviceOrientation,
         heading: this.deviceOrientation.webkitCompassHeading,
@@ -138,10 +139,11 @@ class DeviceOrientationControls {
       this.camera.rotation.y =
         DEG2RAD * -this.deviceOrientation.webkitCompassHeading
       currHeading = this.deviceOrientation.webkitCompassHeading
-    } else {
-      this.camera.rotation.y = alpha
-      currHeading = alpha
     }
+    // else {
+    //   this.camera.rotation.y = alpha
+    //   currHeading = alpha
+    // }
 
     // By how much are we off from north
     const delta = -(360 - currHeading)
@@ -150,6 +152,7 @@ class DeviceOrientationControls {
     // Align the scene rotation with the real world north orientation
     this.scene.rotation.y = deltaRad
     this.scene.updateMatrixWorld()
+    console.log('scene orientation')
 
     // else {
     //   this.setObjectQuaternion(

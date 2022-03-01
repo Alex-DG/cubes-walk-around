@@ -144,6 +144,8 @@ function start(stream) {
       label.lookAt(camera.position)
     })
 
+    console.log('cube placed')
+
     /**
      * FLOOR
      */
@@ -224,11 +226,7 @@ function start(stream) {
    */
   controls = new DeviceOrientationControls({
     camera,
-    world: {
-      cubes: objects,
-      labels,
-      scene,
-    },
+    scene,
   })
 
   /**

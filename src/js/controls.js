@@ -19,11 +19,12 @@ class DeviceOrientationControls {
 
   deviceOrientation
 
-  world = { cubes: [], labels: [] }
+  scene = null
 
-  constructor({ camera, world }) {
+  constructor({ camera, scene }) {
     this.camera = camera
-    this.world = world
+    this.scene = scene
+
     // this.camera.rotation.reorder('YXZ')
 
     this.bind()
@@ -38,10 +39,6 @@ class DeviceOrientationControls {
       this.onDeviceOrientationChangeEvent.bind(this)
 
     this.onDeviceMotionChangeEvent = this.onDeviceMotionChangeEvent.bind(this)
-
-    // this.onPositionUpdate = this.onPositionUpdate.bind(this)
-
-    // this.watchPositionError = this.watchPositionError.bind(this)
   }
 
   connect() {
@@ -125,25 +122,14 @@ class DeviceOrientationControls {
       ? THREE.MathUtils.degToRad(this.screenOrientation)
       : 0 // O
 
+    // don't use device relative rotations
+    //this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
+
     // use webkitCompassHeading to set camera forward direction to magnetic North
     if (this.deviceOrientation) {
-      console.log({
-        deviceOrientation: this.deviceOrientation,
-        heading: this.deviceOrientation.webkitCompassHeading,
-      })
-
       this.camera.rotation.y =
         DEG2RAD * -this.deviceOrientation.webkitCompassHeading
     }
-    // else {
-    //   this.setObjectQuaternion(
-    //     this.camera.quaternion,
-    //     alpha,
-    //     beta,
-    //     gamma,
-    //     orient
-    //   )
-    // }
 
     this.alphaDeg = this.deviceOrientation?.alpha || 0
     this.alphaRad = alpha

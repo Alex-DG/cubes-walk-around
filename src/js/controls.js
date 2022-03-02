@@ -125,10 +125,17 @@ class DeviceOrientationControls {
     // don't use device relative rotations
     //this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
 
-    // use webkitCompassHeading to set camera forward direction to magnetic North
     if (this.deviceOrientation) {
-      this.camera.rotation.y =
-        DEG2RAD * -this.deviceOrientation.webkitCompassHeading
+      if (isIOS()) {
+        console.log('WebkitCompass > OK')
+
+        // use webkitCompassHeading to set camera forward direction to magnetic North
+        this.camera.rotation.y =
+          DEG2RAD * -this.deviceOrientation.webkitCompassHeading || 1
+      } else {
+        // alert('No compass data available')
+        console.log('WebkitCompass > NO')
+      }
     }
 
     this.alphaDeg = this.deviceOrientation?.alpha || 0

@@ -7,7 +7,7 @@ import { cameraFeed, hideContainer, showData } from './dom.js'
 import { createCubeLabel, createCubePosition } from './cube.js'
 
 import DeviceGeolocation from './deviceGeolocation'
-import { isMobile } from './utils'
+import { isIOS, isMobile } from './utils'
 
 /**
  * BASE
@@ -23,9 +23,6 @@ const color = new THREE.Color()
 let prevTime = performance.now()
 
 const mobile = isMobile()
-const body = document.querySelector('body')
-
-// console.log({ h: body.clientHeight, w: body.clientWidth })
 
 // Camera parameters
 const options = {
@@ -143,8 +140,6 @@ function start(stream) {
       // object.lookAt(camera.position)
       label.lookAt(camera.position)
     })
-
-    console.log('cube placed')
 
     /**
      * FLOOR

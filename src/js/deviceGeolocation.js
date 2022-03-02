@@ -1,14 +1,9 @@
 import LocalCoordSystem from './localCoordSystem'
 
-import KalmanFilter from 'kalmanjs'
-
 const DEFAULT_F = 1000 // ms
 
 class Device_Geo_Location {
   init({ createWorldObjects, camera, updateWorld }) {
-    this.kf = new KalmanFilter()
-    this.kfData = []
-
     this.updateWorld = updateWorld
     this.createWorldObjects = createWorldObjects
     this.camera = camera
@@ -80,8 +75,6 @@ class Device_Geo_Location {
   }
 
   watchPositionUpdate(data) {
-    console.log({ data })
-    console.time('time')
     const {
       coords: { longitude, latitude, speed, accuracy },
     } = data
@@ -89,8 +82,6 @@ class Device_Geo_Location {
     this.accuracy = accuracy
     this.longitude = longitude
     this.latitude = latitude
-
-    console.log({ longitude, latitude })
 
     // First time: store initial coordiantes
     if (!this.initCoords) {
@@ -108,27 +99,6 @@ class Device_Geo_Location {
     if (this.isInit) {
       LocalCoordSystem.getPosition(this.camera.position, latitude, longitude)
       this.updateWorld()
-
-      // if (this.kfData.length <= 3) {
-      //   this.kfData.push({ latitude, longitude })
-      // } else {
-      //   let lat
-      //   let lng
-
-      //   console.log({ data: this.kfData })
-
-      //   this.kfData.forEach((d) => {
-      //     lat = this.kf.filter(d.latitude)
-      //     lng = this.kf.filter(d.longitude)
-      //   })
-
-      //   this.kfData = []
-
-      //   console.log({ lat, lng })
-
-      //   LocalCoordSystem.getPosition(this.camera.position, lat, lng)
-      //   this.updateWorld()
-      // }
     }
 
     this.domUpdate()
@@ -136,11 +106,6 @@ class Device_Geo_Location {
 
   updatePosition() {
     const frequency = this.frequency
-
-    console.log('debug - updatePosition()', {
-      frequency,
-      options: this.options,
-    })
 
     this.interval = setInterval(() => {
       this.watchID = this.geoLoc.getCurrentPosition(

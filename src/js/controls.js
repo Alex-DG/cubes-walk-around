@@ -1,4 +1,8 @@
 import * as THREE from 'three'
+
+// Import the objects you need.
+import { Gyroscope, AbsoluteOrientationSensor } from 'motion-sensors-polyfill'
+
 import { isIOS } from './utils'
 
 const DEG2RAD = Math.PI / 180
@@ -19,13 +23,51 @@ class DeviceOrientationControls {
 
   deviceOrientation
 
+  sensor
+
   scene = null
 
   constructor({ camera, scene }) {
     this.camera = camera
     this.scene = scene
 
+    if (!isIOS()) {
+      this.sensor = new AbsoluteOrientationSensor({
+        frequency: 60,
+        coordinateSystem: null,
+      })
+      this.sensor.onreading = () => {
+        this.camera.quaternion.fromArray(this.sensor.quaternion).invert()
+      }
+
+      this.sensor.start()
+    }
+
     // this.camera.rotation.reorder('YXZ')
+
+    // let gyroscope = new Gyroscope({ frequency: 15 })
+    // let absoluteOrientationSensor = new AbsoluteOrientationSensor({
+    //   frequency: 60,
+    // })
+
+    // absoluteOrientationSensor.start()
+    // absoluteOrientationSensor.onreading = (e) => {
+    //   console.log('onreading', e)
+    // }
+
+    // gyroscope.start()
+    // gyroscope.onreading = (e) => {
+    //   console.log('gyro > onreading', e)
+    // }
+
+    // orientation.onreading = (data) => {
+    //   console.log({ data })
+    // }
+
+    // console.log({
+    //   gyroscope,
+    //   orientation,
+    // })
 
     this.bind()
     this.connect()
@@ -127,14 +169,32 @@ class DeviceOrientationControls {
 
     if (this.deviceOrientation) {
       if (isIOS()) {
-        console.log('WebkitCompass > OK')
+        console.log(
+          'WebkitCompass > OK',
+          this.deviceOrientation.webkitCompassHeading
+        )
 
         // use webkitCompassHeading to set camera forward direction to magnetic North
         this.camera.rotation.y =
           DEG2RAD * -this.deviceOrientation.webkitCompassHeading || 1
       } else {
         // alert('No compass data available')
-        console.log('WebkitCompass > NO')
+        this.camera.lookAt(this.scene.position)
+        // if (this.sensor?.quaternion) {
+        //   console.log('WebkitCompass > NO', this.sensor)
+        //   this.camera.quaternion.fromArray(this.sensor.quaternion).invert()
+        // }
+        // result average
+        // this.camera.rotation.y = Math.abs(alpha - 360)
+        // not a solution
+        // this.camera.rotation.y = Math.abs(this.deviceOrientation.alpha - 360)
+        // not working
+        // let a = alpha
+        // if (!window.chrome) {
+        //   //Assume Android stock (this is crude, but good enough for our example) and apply offset
+        //   a = alpha - 270
+        // }
+        // this.camera.rotation.y = a
       }
     }
 

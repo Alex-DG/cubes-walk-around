@@ -5,8 +5,6 @@ import { Gyroscope, AbsoluteOrientationSensor } from 'motion-sensors-polyfill'
 
 import { isIOS } from './utils'
 
-const DEG2RAD = Math.PI / 180
-
 class DeviceOrientationControls {
   geoLoc
   watchID
@@ -30,44 +28,6 @@ class DeviceOrientationControls {
   constructor({ camera, scene }) {
     this.camera = camera
     this.scene = scene
-
-    if (!isIOS()) {
-      this.sensor = new AbsoluteOrientationSensor({
-        frequency: 60,
-        coordinateSystem: null,
-      })
-      this.sensor.onreading = () => {
-        this.camera.quaternion.fromArray(this.sensor.quaternion).invert()
-      }
-
-      this.sensor.start()
-    }
-
-    // this.camera.rotation.reorder('YXZ')
-
-    // let gyroscope = new Gyroscope({ frequency: 15 })
-    // let absoluteOrientationSensor = new AbsoluteOrientationSensor({
-    //   frequency: 60,
-    // })
-
-    // absoluteOrientationSensor.start()
-    // absoluteOrientationSensor.onreading = (e) => {
-    //   console.log('onreading', e)
-    // }
-
-    // gyroscope.start()
-    // gyroscope.onreading = (e) => {
-    //   console.log('gyro > onreading', e)
-    // }
-
-    // orientation.onreading = (data) => {
-    //   console.log({ data })
-    // }
-
-    // console.log({
-    //   gyroscope,
-    //   orientation,
-    // })
 
     this.bind()
     this.connect()
@@ -167,35 +127,28 @@ class DeviceOrientationControls {
     // don't use device relative rotations
     //this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
 
-    if (this.deviceOrientation) {
-      if (isIOS()) {
-        console.log(
-          'WebkitCompass > OK',
-          this.deviceOrientation.webkitCompassHeading
-        )
+    let headingDegrees = 0
+    const event = this.deviceOrientation
+    if (event) {
+      // if (event.absolute) { // not working
+      //   // apparently this is true on android
+      //   // https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent
+      //   // https://www.w3.org/2008/geolocation/wiki/images/e/e0/Device_Orientation_%27alpha%27_Calibration-_Implementation_Status_and_Challenges.pdf
+      //   headingDegrees = event.alpha
+      // } else if (typeof event.webkitCompassHeading !== 'undefined') {
+      //   // iOS absolute compass heading
+      //   headingDegrees = event.webkitCompassHeading
+      // }
 
-        // use webkitCompassHeading to set camera forward direction to magnetic North
-        this.camera.rotation.y =
-          DEG2RAD * -this.deviceOrientation.webkitCompassHeading || 1
+      if (typeof event.webkitCompassHeading !== 'undefined') {
+        // iOS absolute compass heading
+        headingDegrees = event.webkitCompassHeading
       } else {
-        // alert('No compass data available')
-        this.camera.lookAt(this.scene.position)
-        // if (this.sensor?.quaternion) {
-        //   console.log('WebkitCompass > NO', this.sensor)
-        //   this.camera.quaternion.fromArray(this.sensor.quaternion).invert()
-        // }
-        // result average
-        // this.camera.rotation.y = Math.abs(alpha - 360)
-        // not a solution
-        // this.camera.rotation.y = Math.abs(this.deviceOrientation.alpha - 360)
-        // not working
-        // let a = alpha
-        // if (!window.chrome) {
-        //   //Assume Android stock (this is crude, but good enough for our example) and apply offset
-        //   a = alpha - 270
-        // }
-        // this.camera.rotation.y = a
+        headingDegrees = event.alpha
       }
+      const DEG2RAD = Math.PI / 180
+      console.log({ headingDegrees })
+      this.camera.rotation.y = DEG2RAD * -headingDegrees
     }
 
     this.alphaDeg = this.deviceOrientation?.alpha || 0

@@ -114,28 +114,29 @@ class DeviceOrientationControls {
   update(deltaTime) {
     if (this.enabled === false) return
 
-    const alpha = this.deviceOrientation?.alpha
-      ? THREE.MathUtils.degToRad(this.deviceOrientation.alpha) +
-        this.alphaOffsetAngle
-      : 0 // Z
-    const beta = this.deviceOrientation?.beta
-      ? THREE.MathUtils.degToRad(this.deviceOrientation.beta) +
-        this.betaOffsetAngle
-      : 0 // X'
-    const gamma = this.deviceOrientation?.gamma
-      ? THREE.MathUtils.degToRad(this.deviceOrientation.gamma) +
-        this.gammaOffsetAngle
-      : 0 // Y''
-    const orient = this.screenOrientation
-      ? THREE.MathUtils.degToRad(this.screenOrientation)
-      : 0 // O
+    // const alpha = this.deviceOrientation?.alpha
+    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.alpha) +
+    //     this.alphaOffsetAngle
+    //   : 0 // Z
+    // const beta = this.deviceOrientation?.beta
+    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.beta) +
+    //     this.betaOffsetAngle
+    //   : 0 // X'
+    // const gamma = this.deviceOrientation?.gamma
+    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.gamma) +
+    //     this.gammaOffsetAngle
+    //   : 0 // Y''
+    // const orient = this.screenOrientation
+    //   ? THREE.MathUtils.degToRad(this.screenOrientation)
+    //   : 0 // O
 
-    // don't use device relative rotations
+    // on't use device relative rotations
     //this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
 
     let headingDegrees = 0
     const event = this.deviceOrientation
-    if (event && event.absolute) {
+
+    if (event) {
       // Test1 - not working (need: deviceorientationabsolute)
       // if (event.absolute) {
       //   // apparently this is true on android
@@ -157,18 +158,21 @@ class DeviceOrientationControls {
       // this.camera.rotation.y = DEG2RAD * -headingDegrees
 
       // Test3 - with deviceorientationabsolute
+      // https://developer.mozilla.org/en-US/docs/Web/API/Window/ondeviceorientationabsolute
       const DEG2RAD = Math.PI / 180
-      // headingDegrees = event.webkitCompassHeading || Math.abs(event.alpha - 360)
-      headingDegrees =
-        'webkitCompassHeading' in event
-          ? event.webkitCompassHeading
-          : -event.alpha
+      if (event.absolute) {
+        headingDegrees = -event.alpha
+      } else if (typeof event.webkitCompassHeading !== 'undefined') {
+        // iOS absolute compass heading
+        headingDegrees = event.webkitCompassHeading
+      }
+
       this.headingDom.innerHTML = `headingDeg: ${headingDegrees?.toFixed(2)}°`
       this.camera.rotation.y = DEG2RAD * -headingDegrees
     }
 
-    this.alphaDeg = this.deviceOrientation?.alpha || 0
-    this.alphaRad = alpha
+    // this.alphaDeg = this.deviceOrientation?.alpha || 0
+    // this.alphaRad = alpha
   }
 
   /**

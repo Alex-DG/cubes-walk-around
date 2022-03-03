@@ -1,7 +1,9 @@
 import * as THREE from 'three'
-import { isIOS } from './utils'
 
-const DEG2RAD = Math.PI / 180
+// Import the objects you need.
+import { Gyroscope, AbsoluteOrientationSensor } from 'motion-sensors-polyfill'
+
+import { isIOS } from './utils'
 
 class DeviceOrientationControls {
   geoLoc
@@ -19,13 +21,15 @@ class DeviceOrientationControls {
 
   deviceOrientation
 
+  sensor
+
   scene = null
 
   constructor({ camera, scene }) {
     this.camera = camera
     this.scene = scene
 
-    // this.camera.rotation.reorder('YXZ')
+    this.headingDom = document.getElementById('val6')
 
     this.bind()
     this.connect()
@@ -49,18 +53,22 @@ class DeviceOrientationControls {
       this.onScreenOrientationChangeEvent,
       true
     )
+    // window.addEventListener(
+    //   'deviceorientation',
+    //   this.onDeviceOrientationChangeEvent,
+    //   true
+    // )
     window.addEventListener(
-      'deviceorientation',
+      'deviceorientationabsolute',
       this.onDeviceOrientationChangeEvent,
       true
     )
+
     window.addEventListener(
       'devicemotion',
       this.onDeviceMotionChangeEvent,
       true
     )
-
-    // this.watchPosition()
 
     this.enabled = true
   }
@@ -106,40 +114,65 @@ class DeviceOrientationControls {
   update(deltaTime) {
     if (this.enabled === false) return
 
-    const alpha = this.deviceOrientation?.alpha
-      ? THREE.MathUtils.degToRad(this.deviceOrientation.alpha) +
-        this.alphaOffsetAngle
-      : 0 // Z
-    const beta = this.deviceOrientation?.beta
-      ? THREE.MathUtils.degToRad(this.deviceOrientation.beta) +
-        this.betaOffsetAngle
-      : 0 // X'
-    const gamma = this.deviceOrientation?.gamma
-      ? THREE.MathUtils.degToRad(this.deviceOrientation.gamma) +
-        this.gammaOffsetAngle
-      : 0 // Y''
-    const orient = this.screenOrientation
-      ? THREE.MathUtils.degToRad(this.screenOrientation)
-      : 0 // O
+    // const alpha = this.deviceOrientation?.alpha
+    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.alpha) +
+    //     this.alphaOffsetAngle
+    //   : 0 // Z
+    // const beta = this.deviceOrientation?.beta
+    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.beta) +
+    //     this.betaOffsetAngle
+    //   : 0 // X'
+    // const gamma = this.deviceOrientation?.gamma
+    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.gamma) +
+    //     this.gammaOffsetAngle
+    //   : 0 // Y''
+    // const orient = this.screenOrientation
+    //   ? THREE.MathUtils.degToRad(this.screenOrientation)
+    //   : 0 // O
 
-    // don't use device relative rotations
+    // on't use device relative rotations
     //this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
 
-    if (this.deviceOrientation) {
-      if (isIOS()) {
-        console.log('WebkitCompass > OK')
+    let headingDegrees = 0
+    const event = this.deviceOrientation
 
-        // use webkitCompassHeading to set camera forward direction to magnetic North
-        this.camera.rotation.y =
-          DEG2RAD * -this.deviceOrientation.webkitCompassHeading || 1
-      } else {
-        // alert('No compass data available')
-        console.log('WebkitCompass > NO')
+    if (event) {
+      // Test1 - not working (need: deviceorientationabsolute)
+      // if (event.absolute) {
+      //   // apparently this is true on android
+      //   // https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent
+      //   // https://www.w3.org/2008/geolocation/wiki/images/e/e0/Device_Orientation_%27alpha%27_Calibration-_Implementation_Status_and_Challenges.pdf
+      //   headingDegrees = event.alpha
+      // } else if (typeof event.webkitCompassHeading !== 'undefined') {
+      //   // iOS absolute compass heading
+      //   headingDegrees = event.webkitCompassHeading
+      // }
+
+      // Test2 not working alpha value is probably wrong/not absolute
+      // if (typeof event.webkitCompassHeading !== 'undefined') {
+      //   // iOS absolute compass heading
+      //   headingDegrees = event.webkitCompassHeading
+      // } else {
+      //   headingDegrees = event.alpha
+      // }
+      // this.camera.rotation.y = DEG2RAD * -headingDegrees
+
+      // Test3 - with deviceorientationabsolute
+      // https://developer.mozilla.org/en-US/docs/Web/API/Window/ondeviceorientationabsolute
+      const DEG2RAD = Math.PI / 180
+      if (event.absolute) {
+        headingDegrees = -event.alpha
+      } else if (typeof event.webkitCompassHeading !== 'undefined') {
+        // iOS absolute compass heading
+        headingDegrees = event.webkitCompassHeading
       }
+
+      this.headingDom.innerHTML = `headingDeg: ${headingDegrees?.toFixed(2)}°`
+      this.camera.rotation.y = DEG2RAD * -headingDegrees
     }
 
-    this.alphaDeg = this.deviceOrientation?.alpha || 0
-    this.alphaRad = alpha
+    // this.alphaDeg = this.deviceOrientation?.alpha || 0
+    // this.alphaRad = alpha
   }
 
   /**

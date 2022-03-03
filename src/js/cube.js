@@ -23,7 +23,7 @@ export const createCubePosition = (cube, camera) => {
     color: _COLORS[(Math.random() * _COLORS.length) | 0],
   })
 
-  const distance = getRandomNumber(3, 15)
+  const distance = getRandomNumber(5, 20)
 
   const randomGeoPoints = generateRandomPoints(
     { lat: latitude, lng: longitude },

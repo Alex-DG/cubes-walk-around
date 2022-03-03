@@ -29,6 +29,8 @@ class DeviceOrientationControls {
     this.camera = camera
     this.scene = scene
 
+    this.headingDom = document.getElementById('val6')
+
     this.bind()
     this.connect()
   }
@@ -51,18 +53,22 @@ class DeviceOrientationControls {
       this.onScreenOrientationChangeEvent,
       true
     )
+    // window.addEventListener(
+    //   'deviceorientation',
+    //   this.onDeviceOrientationChangeEvent,
+    //   true
+    // )
     window.addEventListener(
-      'deviceorientation',
+      'deviceorientationabsolute',
       this.onDeviceOrientationChangeEvent,
       true
     )
+
     window.addEventListener(
       'devicemotion',
       this.onDeviceMotionChangeEvent,
       true
     )
-
-    // this.watchPosition()
 
     this.enabled = true
   }
@@ -130,7 +136,8 @@ class DeviceOrientationControls {
     let headingDegrees = 0
     const event = this.deviceOrientation
     if (event) {
-      // if (event.absolute) { // not working
+      // Test1 - not working (need: deviceorientationabsolute)
+      // if (event.absolute) {
       //   // apparently this is true on android
       //   // https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent
       //   // https://www.w3.org/2008/geolocation/wiki/images/e/e0/Device_Orientation_%27alpha%27_Calibration-_Implementation_Status_and_Challenges.pdf
@@ -140,14 +147,19 @@ class DeviceOrientationControls {
       //   headingDegrees = event.webkitCompassHeading
       // }
 
-      if (typeof event.webkitCompassHeading !== 'undefined') {
-        // iOS absolute compass heading
-        headingDegrees = event.webkitCompassHeading
-      } else {
-        headingDegrees = event.alpha
-      }
+      // Test2 not working alpha value is probably wrong/not absolute
+      // if (typeof event.webkitCompassHeading !== 'undefined') {
+      //   // iOS absolute compass heading
+      //   headingDegrees = event.webkitCompassHeading
+      // } else {
+      //   headingDegrees = event.alpha
+      // }
+      // this.camera.rotation.y = DEG2RAD * -headingDegrees
+
+      // Test3 - with deviceorientationabsolute
       const DEG2RAD = Math.PI / 180
-      console.log({ headingDegrees })
+      headingDegrees = event.webkitCompassHeading || Math.abs(event.alpha - 360)
+      this.headingDom.innerHTML = `headingDeg: ${headingDegrees}°`
       this.camera.rotation.y = DEG2RAD * -headingDegrees
     }
 

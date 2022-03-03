@@ -135,7 +135,7 @@ class DeviceOrientationControls {
 
     let headingDegrees = 0
     const event = this.deviceOrientation
-    if (event) {
+    if (event && event.absolute) {
       // Test1 - not working (need: deviceorientationabsolute)
       // if (event.absolute) {
       //   // apparently this is true on android
@@ -158,8 +158,12 @@ class DeviceOrientationControls {
 
       // Test3 - with deviceorientationabsolute
       const DEG2RAD = Math.PI / 180
-      headingDegrees = event.webkitCompassHeading || Math.abs(event.alpha - 360)
-      this.headingDom.innerHTML = `headingDeg: ${headingDegrees}°`
+      // headingDegrees = event.webkitCompassHeading || Math.abs(event.alpha - 360)
+      headingDegrees =
+        'webkitCompassHeading' in event
+          ? event.webkitCompassHeading
+          : -event.alpha
+      this.headingDom.innerHTML = `headingDeg: ${headingDegrees?.toFixed(2)}°`
       this.camera.rotation.y = DEG2RAD * -headingDegrees
     }
 

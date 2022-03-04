@@ -53,16 +53,20 @@ class DeviceOrientationControls {
       this.onScreenOrientationChangeEvent,
       true
     )
-    // window.addEventListener(
-    //   'deviceorientation',
-    //   this.onDeviceOrientationChangeEvent,
-    //   true
-    // )
-    window.addEventListener(
-      'deviceorientationabsolute',
-      this.onDeviceOrientationChangeEvent,
-      true
-    )
+
+    if (isIOS()) {
+      window.addEventListener(
+        'deviceorientation',
+        this.onDeviceOrientationChangeEvent,
+        true
+      )
+    } else {
+      window.addEventListener(
+        'deviceorientationabsolute',
+        this.onDeviceOrientationChangeEvent,
+        true
+      )
+    }
 
     window.addEventListener(
       'devicemotion',

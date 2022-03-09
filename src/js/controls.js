@@ -118,65 +118,32 @@ class DeviceOrientationControls {
   update(deltaTime) {
     if (this.enabled === false) return
 
-    // const alpha = this.deviceOrientation?.alpha
-    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.alpha) +
-    //     this.alphaOffsetAngle
-    //   : 0 // Z
-    // const beta = this.deviceOrientation?.beta
-    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.beta) +
-    //     this.betaOffsetAngle
-    //   : 0 // X'
-    // const gamma = this.deviceOrientation?.gamma
-    //   ? THREE.MathUtils.degToRad(this.deviceOrientation.gamma) +
-    //     this.gammaOffsetAngle
-    //   : 0 // Y''
-    // const orient = this.screenOrientation
-    //   ? THREE.MathUtils.degToRad(this.screenOrientation)
-    //   : 0 // O
-
-    // on't use device relative rotations
-    //this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
-
     let headingDegrees = 0
     const event = this.deviceOrientation
 
     if (event) {
-      // Test1 - not working (need: deviceorientationabsolute)
-      // if (event.absolute) {
-      //   // apparently this is true on android
-      //   // https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent
-      //   // https://www.w3.org/2008/geolocation/wiki/images/e/e0/Device_Orientation_%27alpha%27_Calibration-_Implementation_Status_and_Challenges.pdf
-      //   headingDegrees = event.alpha
-      // } else if (typeof event.webkitCompassHeading !== 'undefined') {
-      //   // iOS absolute compass heading
-      //   headingDegrees = event.webkitCompassHeading
-      // }
 
-      // Test2 not working alpha value is probably wrong/not absolute
-      // if (typeof event.webkitCompassHeading !== 'undefined') {
-      //   // iOS absolute compass heading
-      //   headingDegrees = event.webkitCompassHeading
-      // } else {
-      //   headingDegrees = event.alpha
-      // }
-      // this.camera.rotation.y = DEG2RAD * -headingDegrees
-
-      // Test3 - with deviceorientationabsolute
-      // https://developer.mozilla.org/en-US/docs/Web/API/Window/ondeviceorientationabsolute
-      const DEG2RAD = Math.PI / 180
-      if (event.absolute) {
-        headingDegrees = -event.alpha
-      } else if (typeof event.webkitCompassHeading !== 'undefined') {
-        // iOS absolute compass heading
-        headingDegrees = event.webkitCompassHeading
-      }
-
-      this.headingDom.innerHTML = `headingDeg: ${headingDegrees?.toFixed(2)}°`
-      this.camera.rotation.y = DEG2RAD * -headingDegrees
+      if (event.webkitCompassHeading !== undefined) {
+            if (event.webkitCompassAccuracy < 50) {
+                headingDegrees = event.webkitCompassHeading;
+            } else {
+                console.warn('webkitCompassAccuracy is event.webkitCompassAccuracy');
+            }
+        } else if (event.alpha !== null) {
+            if (event.absolute === true || event.absolute === undefined) {
+                headingDegrees = this.computeCompassHeading(event.alpha, event.beta, event.gamma);
+            } else {
+                console.warn('alpha event.absolute === false');
+            }
+        } else {
+            console.warn('alpha event.alpha === null');
+        }
+ 
+     const DEG2RAD = Math.PI / 180;
+     
+     this.headingDom.innerHTML = `headingDeg: ${headingDegrees?.toFixed(2)}°`;
+     this.camera.rotation.y = DEG2RAD * -headingDegrees;
     }
-
-    // this.alphaDeg = this.deviceOrientation?.alpha || 0
-    // this.alphaRad = alpha
   }
 
   /**
@@ -227,6 +194,41 @@ class DeviceOrientationControls {
     this.gammaOffsetAngle = angle
     this.update()
   }
+
+  computeCompassHeading(alpha, beta, gamma) {
+
+        // Convert degrees to radians
+        var alphaRad = alpha * (Math.PI / 180);
+        var betaRad = beta * (Math.PI / 180);
+        var gammaRad = gamma * (Math.PI / 180);
+
+        // Calculate equation components
+        var cA = Math.cos(alphaRad);
+        var sA = Math.sin(alphaRad);
+        var sB = Math.sin(betaRad);
+        var cG = Math.cos(gammaRad);
+        var sG = Math.sin(gammaRad);
+
+        // Calculate A, B, C rotation components
+        var rA = - cA * sG - sA * sB * cG;
+        var rB = - sA * sG + cA * sB * cG;
+
+        // Calculate compass heading
+        var compassHeading = Math.atan(rA / rB);
+
+        // Convert from half unit circle to whole unit circle
+        if (rB < 0) {
+            compassHeading += Math.PI;
+        } else if (rA < 0) {
+            compassHeading += 2 * Math.PI;
+        }
+
+        // Convert radians to degrees
+        compassHeading *= 180 / Math.PI;
+
+        return compassHeading;
+  }
+
 }
 
 export default DeviceOrientationControls

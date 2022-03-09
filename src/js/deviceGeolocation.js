@@ -98,6 +98,7 @@ class Device_Geo_Location {
     // Once setup done: keep updating the camera position
     if (this.isInit) {
       LocalCoordSystem.getPosition(this.camera.position, latitude, longitude)
+      //this.camera.position.y = 0;
       this.updateWorld()
     }
 

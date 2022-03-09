@@ -84,8 +84,9 @@ class DeviceOrientationControls {
     const event = this.deviceOrientation;
     if (event) {
       const initialHeading = this.getTrueHeading(event);
-
-      this.scene.rotation.y = -initialHeading * this.DEG2RAD;
+      const delta = -(360 - initialHeading);
+      this.scene.rotation.y = -delta * this.DEG2RAD;
+      this.scene.updateMatrixWorld();
       this.calibrated = true;
     }
   }
@@ -138,7 +139,7 @@ class DeviceOrientationControls {
       if (!this.calibrated) this.calibrateScene();
 
       headingDegrees = this.getTrueHeading(event);
-
+      // this.alphaOffsetAngle = headingDegrees * this.DEG2RAD;
       this.headingDom.innerHTML = `headingDeg: ${headingDegrees?.toFixed(2)}°`;
       //  this.camera.rotation.y = DEG2RAD * -headingDegrees;
 
@@ -240,23 +241,23 @@ class DeviceOrientationControls {
 
   computeCompassHeading(alpha, beta, gamma) {
     // Convert degrees to radians
-    var alphaRad = alpha * (Math.PI / 180);
-    var betaRad = beta * (Math.PI / 180);
-    var gammaRad = gamma * (Math.PI / 180);
+    const alphaRad = alpha * (Math.PI / 180);
+    const betaRad = beta * (Math.PI / 180);
+    const gammaRad = gamma * (Math.PI / 180);
 
     // Calculate equation components
-    var cA = Math.cos(alphaRad);
-    var sA = Math.sin(alphaRad);
-    var sB = Math.sin(betaRad);
-    var cG = Math.cos(gammaRad);
-    var sG = Math.sin(gammaRad);
+    const cA = Math.cos(alphaRad);
+    const sA = Math.sin(alphaRad);
+    const sB = Math.sin(betaRad);
+    const cG = Math.cos(gammaRad);
+    const sG = Math.sin(gammaRad);
 
     // Calculate A, B, C rotation components
-    var rA = -cA * sG - sA * sB * cG;
-    var rB = -sA * sG + cA * sB * cG;
+    const rA = -cA * sG - sA * sB * cG;
+    const rB = -sA * sG + cA * sB * cG;
 
     // Calculate compass heading
-    var compassHeading = Math.atan(rA / rB);
+    let compassHeading = Math.atan(rA / rB);
 
     // Convert from half unit circle to whole unit circle
     if (rB < 0) {

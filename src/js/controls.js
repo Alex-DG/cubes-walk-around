@@ -13,7 +13,7 @@ class DeviceOrientationControls {
   initCoords = undefined
 
   enabled = true
-
+  calibrated = false
   alphaOffsetAngle = 0
   betaOffsetAngle = 0
   gammaOffsetAngle = 0
@@ -24,6 +24,8 @@ class DeviceOrientationControls {
   sensor
 
   scene = null
+
+  DEG2RAD = Math.PI / 180;
 
   constructor({ camera, scene }) {
     this.camera = camera
@@ -77,6 +79,17 @@ class DeviceOrientationControls {
     this.enabled = true
   }
 
+  calibrateScene(){
+    const event = this.deviceOrientation
+    if (event) {
+    const initialHeading = this.getTrueHeading(event)
+
+      
+      this.scene.rotation.y = -initialHeading * this.DEG2RAD
+      this.calibrated = true
+    }
+  }
+
   /**
    * GYRO FUNCTIONS
    */
@@ -121,28 +134,35 @@ class DeviceOrientationControls {
     let headingDegrees = 0
     const event = this.deviceOrientation
 
-    if (event) {
 
-      if (event.webkitCompassHeading !== undefined) {
-            if (event.webkitCompassAccuracy < 50) {
-                headingDegrees = event.webkitCompassHeading;
-            } else {
-                console.warn('webkitCompassAccuracy is event.webkitCompassAccuracy');
-            }
-        } else if (event.alpha !== null) {
-            if (event.absolute === true || event.absolute === undefined) {
-                headingDegrees = this.computeCompassHeading(event.alpha, event.beta, event.gamma);
-            } else {
-                console.warn('alpha event.absolute === false');
-            }
-        } else {
-            console.warn('alpha event.alpha === null');
-        }
+
+    if (event) {
+    if(!this.calibrated)  this.calibrateScene()
+
+    headingDegrees = this.getTrueHeading(event)
  
-     const DEG2RAD = Math.PI / 180;
+     
      
      this.headingDom.innerHTML = `headingDeg: ${headingDegrees?.toFixed(2)}°`;
-     this.camera.rotation.y = DEG2RAD * -headingDegrees;
+    //  this.camera.rotation.y = DEG2RAD * -headingDegrees;
+
+    const alpha = this.deviceOrientation?.alpha
+      ? THREE.MathUtils.degToRad(this.deviceOrientation.alpha) +
+        this.alphaOffsetAngle
+      : 0 // Z
+    const beta = this.deviceOrientation?.beta
+      ? THREE.MathUtils.degToRad(this.deviceOrientation.beta) +
+        this.betaOffsetAngle
+      : 0 // X'
+    const gamma = this.deviceOrientation?.gamma
+      ? THREE.MathUtils.degToRad(this.deviceOrientation.gamma) +
+        this.gammaOffsetAngle
+      : 0 // Y''
+    const orient = this.screenOrientation
+      ? THREE.MathUtils.degToRad(this.screenOrientation)
+      : 0 // O
+
+    this.setObjectQuaternion(this.camera.quaternion, alpha, beta, gamma, orient)
     }
   }
 
@@ -195,6 +215,28 @@ class DeviceOrientationControls {
     this.update()
   }
 
+  getTrueHeading(event){
+    let headingDegrees = 0
+
+    if (event.webkitCompassHeading !== undefined) {
+            if (event.webkitCompassAccuracy < 50) {
+                headingDegrees = event.webkitCompassHeading;
+            } else {
+                console.warn('webkitCompassAccuracy is event.webkitCompassAccuracy');
+            }
+        } else if (event.alpha !== null) {
+            if (event.absolute === true || event.absolute === undefined) {
+                headingDegrees = this.computeCompassHeading(event.alpha, event.beta, event.gamma);
+            } else {
+                console.warn('alpha event.absolute === false');
+            }
+        } else {
+            console.warn('alpha event.alpha === null');
+        }
+
+    return headingDegrees
+  }
+
   computeCompassHeading(alpha, beta, gamma) {
 
         // Convert degrees to radians
@@ -224,7 +266,7 @@ class DeviceOrientationControls {
         }
 
         // Convert radians to degrees
-        compassHeading *= 180 / Math.PI;
+        compassHeading *= this.DEG2RAD;
 
         return compassHeading;
   }

@@ -1,30 +1,30 @@
-import * as THREE from 'three'
+import * as THREE from "three";
 
-import '../style.css'
-import DeviceOrientationControls from './controls'
+import "../style.css";
+import DeviceOrientationControls from "./controls";
 
-import { cameraFeed, hideContainer, showData } from './dom.js'
-import { createCubeLabel, createCubePosition } from './cube.js'
+import { cameraFeed, hideContainer, showData } from "./dom.js";
+import { createCubeLabel, createCubePosition } from "./cube.js";
 
-import DeviceGeolocation from './deviceGeolocation'
-import { isMobile, lookAtCamera } from './utils'
+import DeviceGeolocation from "./deviceGeolocation";
+import { isMobile, lookAtCamera } from "./utils";
 
-import pinSrc from '../assets/pin.png'
+import pinSrc from "../assets/pin.png";
 
 /**
  * BASE
  */
-let camera, scene, renderer, controls
+let camera, scene, renderer, controls;
 
-const objects = []
-let labels = []
+const objects = [];
+let labels = [];
 
-const vertex = new THREE.Vector3()
-const color = new THREE.Color()
+const vertex = new THREE.Vector3();
+const color = new THREE.Color();
 
-let prevTime = performance.now()
+let prevTime = performance.now();
 
-const mobile = isMobile()
+const mobile = isMobile();
 
 // Camera parameters
 const options = {
@@ -35,48 +35,48 @@ const options = {
     facingMode: !mobile
       ? null
       : {
-          exact: 'environment',
+          exact: "environment",
         },
   },
-}
+};
 
 /**
  * INIT EXPERIENCE
  */
 const init = () => {
-  navigator.mediaDevices.getUserMedia(options).then((stream) => {
-    start(stream)
-    animate()
-  })
-}
+  navigator.mediaDevices.getUserMedia(options).then(stream => {
+    start(stream);
+    animate();
+  });
+};
 
 /**
  * Handle permissions ios.............
  */
-const btnAccess = document.getElementById('btn-access')
-btnAccess.addEventListener('click', () => {
-  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+const btnAccess = document.getElementById("btn-access");
+btnAccess.addEventListener("click", () => {
+  if (typeof DeviceMotionEvent.requestPermission === "function") {
     DeviceMotionEvent.requestPermission()
-      .then((permissionState) => {
-        if (permissionState === 'granted') {
-          if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      .then(permissionState => {
+        if (permissionState === "granted") {
+          if (typeof DeviceOrientationEvent.requestPermission === "function") {
             DeviceOrientationEvent.requestPermission()
-              .then((permissionState) => {
-                if (permissionState === 'granted') {
-                  init()
+              .then(permissionState => {
+                if (permissionState === "granted") {
+                  init();
                 }
               })
-              .catch(console.error)
+              .catch(console.error);
           } else {
-            init()
+            init();
           }
         }
       })
-      .catch(console.error)
+      .catch(console.error);
   } else {
-    init()
+    init();
   }
-})
+});
 
 /**
  * START EXPERIENCE: create 3d world
@@ -87,9 +87,9 @@ function start(stream) {
   /**
    * DOM
    */
-  hideContainer()
-  showData()
-  cameraFeed(stream)
+  hideContainer();
+  showData();
+  cameraFeed(stream);
 
   /**
    * CAMERA
@@ -99,30 +99,40 @@ function start(stream) {
     window.innerWidth / window.innerHeight,
     1,
     1000
-  )
-  camera.position.y = 10
+  );
+  camera.position.y = 10;
 
-  scene = new THREE.Scene()
+  scene = new THREE.Scene();
+
+  /**
+   * CONTROLS: gyro camera and more
+   * Order matter here!
+   */
+  controls = new DeviceOrientationControls({
+    camera,
+    scene,
+  });
+
   // scene.background = new THREE.Color(0xffffff)
-  scene.fog = new THREE.Fog(0xffffff, 0, 750)
+  scene.fog = new THREE.Fog(0xffffff, 0, 750);
 
-  const sun = new THREE.PointLight(0xffffff, 1.425)
-  sun.position.set(0, 2, 0)
-  scene.add(sun)
+  const sun = new THREE.PointLight(0xffffff, 1.425);
+  sun.position.set(0, 2, 0);
+  scene.add(sun);
 
   // Callback: once init corrdinates set
   const createWorldObjects = () => {
     /**
      * CUBES
      */
-    const MAX_CUBES = 20
+    const MAX_CUBES = 10;
 
     const northCube = new THREE.Mesh(
       new THREE.BoxGeometry(1, 1, 1),
       new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
-    )
-    northCube.position.set(0, 0, -10)
-    scene.add(northCube)
+    );
+    northCube.position.set(0, 0, -5);
+    scene.add(northCube);
 
     const worldCube = new THREE.Mesh(
       new THREE.PlaneBufferGeometry(3, 5, 10, 10),
@@ -131,88 +141,92 @@ function start(stream) {
         depthWrite: false,
         map: new THREE.TextureLoader().load(pinSrc),
       })
-    )
+    );
     Array.from({ length: MAX_CUBES }).forEach(() => {
-      const cube = worldCube.clone()
-      const { object, label } = createCubePosition(cube, camera) // cube + label
+      const cube = worldCube.clone();
+      const { object, label } = createCubePosition(cube, camera); // cube + label
 
       // Add 3d objects to the scene
-      scene.add(object)
-      objects.push(object)
+      scene.add(object);
+      objects.push(object);
 
-      scene.add(label)
-      labels.push(label)
+      scene.add(label);
+      labels.push(label);
 
-      lookAtCamera(object, camera)
+      lookAtCamera(object, camera);
       // lookAtCamera(label, camera)
-      label.lookAt(camera.position)
-    })
+      label.lookAt(camera.position);
+    });
 
     /**
      * FLOOR
      */
-    let floorGeometry = new THREE.PlaneGeometry(2000, 2000, 100, 100)
-    floorGeometry.rotateX(-Math.PI / 2)
+    let floorGeometry = new THREE.PlaneGeometry(2000, 2000, 100, 100);
+    floorGeometry.rotateX(-Math.PI / 2);
 
     // vertex displacement
-    let position = floorGeometry.attributes.position
+    let position = floorGeometry.attributes.position;
 
     for (let i = 0, l = position.count; i < l; i++) {
-      vertex.fromBufferAttribute(position, i)
+      vertex.fromBufferAttribute(position, i);
 
-      vertex.x += Math.random() * 20 - 10
-      vertex.y += Math.random() * 2
-      vertex.z += Math.random() * 20 - 10
+      vertex.x += Math.random() * 20 - 10;
+      vertex.y += Math.random() * 2;
+      vertex.z += Math.random() * 20 - 10;
 
-      position.setXYZ(i, vertex.x, vertex.y, vertex.z)
+      position.setXYZ(i, vertex.x, vertex.y, vertex.z);
     }
 
-    floorGeometry = floorGeometry.toNonIndexed() // ensure each face has unique vertices
-    position = floorGeometry.attributes.position
+    floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
+    position = floorGeometry.attributes.position;
 
-    const colorsFloor = []
+    const colorsFloor = [];
     for (let i = 0, l = position.count; i < l; i++) {
-      color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75)
-      colorsFloor.push(color.r, color.g, color.b)
+      color.setHSL(
+        Math.random() * 0.3 + 0.5,
+        0.75,
+        Math.random() * 0.25 + 0.75
+      );
+      colorsFloor.push(color.r, color.g, color.b);
     }
     floorGeometry.setAttribute(
-      'color',
+      "color",
       new THREE.Float32BufferAttribute(colorsFloor, 3)
-    )
+    );
 
-    const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true })
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial)
-    floor.position.y = -5
+    const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.position.y = -5;
     // scene.add(floor)
-  }
+  };
 
   // Callback: every geolocation update
   const updateWorld = () => {
-    const tempLabels = []
+    const tempLabels = [];
 
     objects.forEach((cube, index) => {
       // Get cube label
-      const cubeLabel = labels[index]
+      const cubeLabel = labels[index];
       // Get new distance
-      const newDistance = Math.floor(cube.position.distanceTo(camera.position))
+      const newDistance = Math.floor(cube.position.distanceTo(camera.position));
       // Dipose label
-      scene.remove(cubeLabel)
-      cubeLabel.dispose()
+      scene.remove(cubeLabel);
+      cubeLabel.dispose();
 
       // Create new label
-      const newLabel = createCubeLabel(cube.position, newDistance)
+      const newLabel = createCubeLabel(cube.position, newDistance);
 
       // lookAtCamera(newLabel, camera)
-      newLabel.lookAt(camera.position)
+      newLabel.lookAt(camera.position);
 
       // Add new label to scene
-      scene.add(newLabel)
-      tempLabels.push(newLabel)
-    })
+      scene.add(newLabel);
+      tempLabels.push(newLabel);
+    });
 
     // Update [labels]
-    labels = tempLabels
-  }
+    labels = tempLabels;
+  };
 
   /**
    * Init. watch position: geolocation sensor start
@@ -221,48 +235,40 @@ function start(stream) {
     createWorldObjects,
     camera,
     updateWorld,
-  })
-
-  /**
-   * CONTROLS: gyro camera and more
-   */
-  controls = new DeviceOrientationControls({
-    camera,
-    scene,
-  })
+  });
 
   /**
    * RENDERER
    */
-  const canvas = document.querySelector('canvas.webgl')
-  renderer = new THREE.WebGLRenderer({ antialias: true, canvas, alpha: true })
+  const canvas = document.querySelector("canvas.webgl");
+  renderer = new THREE.WebGLRenderer({ antialias: true, canvas, alpha: true });
 
-  renderer.setPixelRatio(window.devicePixelRatio)
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-  window.addEventListener('resize', onWindowResize)
+  window.addEventListener("resize", onWindowResize);
 }
 
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight
-  camera.updateProjectionMatrix()
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
 
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 /**
  * FRAME LOOP!
  */
 function animate() {
-  requestAnimationFrame(animate)
+  requestAnimationFrame(animate);
 
-  const time = performance.now()
-  const delta = (time - prevTime) / 1000
-  prevTime = time
+  const time = performance.now();
+  const delta = (time - prevTime) / 1000;
+  prevTime = time;
 
-  controls.update(delta)
+  controls.update(delta);
 
-  DeviceGeolocation.update()
+  DeviceGeolocation.update();
 
-  renderer.render(scene, camera)
+  renderer.render(scene, camera);
 }

@@ -78,11 +78,10 @@ export const createCubePosition = (cube, camera) => {
 export const createCubeLabel = (position, distance) => {
   // Create text label
   const label = new Text()
-  label.position.copy(position)
 
-  label.position.x += 0.6
+  label.position.copy(position)
+  label.position.x += 0.5
   label.position.y -= 2.2
-  label.position.z += 0.5
 
   label.text = `${distance.toFixed(1)}m`
   label.fontSize = 0.4

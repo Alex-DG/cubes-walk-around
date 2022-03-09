@@ -106,9 +106,9 @@ function start(stream) {
   // scene.background = new THREE.Color(0xffffff)
   scene.fog = new THREE.Fog(0xffffff, 0, 750)
 
-  const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 1.75)
-  light.position.set(0.5, 1, 0.75)
-  scene.add(light)
+  const sun = new THREE.PointLight(0xffffff, 1.425)
+  sun.position.set(0, 2, 0)
+  scene.add(sun)
 
   // Callback: once init corrdinates set
   const createWorldObjects = () => {
@@ -128,6 +128,7 @@ function start(stream) {
       new THREE.PlaneBufferGeometry(3, 5, 10, 10),
       new THREE.MeshStandardMaterial({
         transparent: true,
+        depthWrite: false,
         map: new THREE.TextureLoader().load(pinSrc),
       })
     )
@@ -197,10 +198,12 @@ function start(stream) {
       // Dipose label
       scene.remove(cubeLabel)
       cubeLabel.dispose()
+
       // Create new label
       const newLabel = createCubeLabel(cube.position, newDistance)
-      newLabel.lookAt(camera.position)
+
       // lookAtCamera(newLabel, camera)
+      newLabel.lookAt(camera.position)
 
       // Add new label to scene
       scene.add(newLabel)

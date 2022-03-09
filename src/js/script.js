@@ -7,7 +7,9 @@ import { cameraFeed, hideContainer, showData } from './dom.js'
 import { createCubeLabel, createCubePosition } from './cube.js'
 
 import DeviceGeolocation from './deviceGeolocation'
-import { isIOS, isMobile, lookAtCamera } from './utils'
+import { isMobile, lookAtCamera } from './utils'
+
+import pinSrc from '../assets/pin.png'
 
 /**
  * BASE
@@ -124,7 +126,10 @@ function start(stream) {
 
     const worldCube = new THREE.Mesh(
       new THREE.PlaneBufferGeometry(3, 5, 10, 10),
-      new THREE.MeshStandardMaterial()
+      new THREE.MeshStandardMaterial({
+        transparent: true,
+        map: new THREE.TextureLoader().load(pinSrc),
+      })
     )
     Array.from({ length: MAX_CUBES }).forEach(() => {
       const cube = worldCube.clone()
@@ -138,7 +143,8 @@ function start(stream) {
       labels.push(label)
 
       lookAtCamera(object, camera)
-      lookAtCamera(label, camera)
+      // lookAtCamera(label, camera)
+      label.lookAt(camera.position)
     })
 
     /**
@@ -193,8 +199,8 @@ function start(stream) {
       cubeLabel.dispose()
       // Create new label
       const newLabel = createCubeLabel(cube.position, newDistance)
-      // newLabel.lookAt(camera.position)
-      lookAtCamera(newLabel, camera)
+      newLabel.lookAt(camera.position)
+      // lookAtCamera(newLabel, camera)
 
       // Add new label to scene
       scene.add(newLabel)

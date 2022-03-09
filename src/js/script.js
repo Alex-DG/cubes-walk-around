@@ -7,7 +7,7 @@ import { cameraFeed, hideContainer, showData } from './dom.js'
 import { createCubeLabel, createCubePosition } from './cube.js'
 
 import DeviceGeolocation from './deviceGeolocation'
-import { isIOS, isMobile } from './utils'
+import { isIOS, isMobile, lookAtCamera } from './utils'
 
 /**
  * BASE
@@ -104,7 +104,7 @@ function start(stream) {
   // scene.background = new THREE.Color(0xffffff)
   scene.fog = new THREE.Fog(0xffffff, 0, 750)
 
-  const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75)
+  const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 1.75)
   light.position.set(0.5, 1, 0.75)
   scene.add(light)
 
@@ -123,8 +123,8 @@ function start(stream) {
     scene.add(northCube)
 
     const worldCube = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial()
+      new THREE.PlaneBufferGeometry(3, 5, 10, 10),
+      new THREE.MeshStandardMaterial()
     )
     Array.from({ length: MAX_CUBES }).forEach(() => {
       const cube = worldCube.clone()
@@ -137,8 +137,8 @@ function start(stream) {
       scene.add(label)
       labels.push(label)
 
-      // object.lookAt(camera.position)
-      label.lookAt(camera.position)
+      lookAtCamera(object, camera)
+      lookAtCamera(label, camera)
     })
 
     /**
@@ -186,17 +186,15 @@ function start(stream) {
     objects.forEach((cube, index) => {
       // Get cube label
       const cubeLabel = labels[index]
-
       // Get new distance
       const newDistance = Math.floor(cube.position.distanceTo(camera.position))
-
       // Dipose label
       scene.remove(cubeLabel)
       cubeLabel.dispose()
-
       // Create new label
       const newLabel = createCubeLabel(cube.position, newDistance)
-      newLabel.lookAt(camera.position)
+      // newLabel.lookAt(camera.position)
+      lookAtCamera(newLabel, camera)
 
       // Add new label to scene
       scene.add(newLabel)

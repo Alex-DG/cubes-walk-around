@@ -19,11 +19,11 @@ export const createCubePosition = (cube, camera) => {
   const object = cube
   const { latitude, longitude } = DeviceGeoLocation.initCoords
 
-  object.material = new THREE.MeshBasicMaterial({
+  object.material = new THREE.MeshStandardMaterial({
     color: _COLORS[(Math.random() * _COLORS.length) | 0],
   })
 
-  const distance = getRandomNumber(5, 20)
+  const distance = getRandomNumber(5, 25)
 
   const randomGeoPoints = generateRandomPoints(
     { lat: latitude, lng: longitude },
@@ -77,9 +77,13 @@ export const createCubeLabel = (position, distance) => {
   // Create text label
   const label = new Text()
   label.position.copy(position)
-  label.position.y = position.y + 1
+
+  label.position.x += 0.7
+  label.position.y -= 1.5
+  label.position.z += 0.5
+
   label.text = `${distance.toFixed(1)}m`
-  label.fontSize = 0.35
+  label.fontSize = 0.4
   label.color = 0xffffff
 
   label.sync()

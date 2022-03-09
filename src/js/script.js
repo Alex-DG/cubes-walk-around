@@ -7,7 +7,9 @@ import { cameraFeed, hideContainer, showData } from './dom.js'
 import { createCubeLabel, createCubePosition } from './cube.js'
 
 import DeviceGeolocation from './deviceGeolocation'
-import { isIOS, isMobile } from './utils'
+import { isMobile, lookAtCamera } from './utils'
+
+import pinSrc from '../assets/pin.png'
 
 /**
  * BASE
@@ -104,9 +106,9 @@ function start(stream) {
   // scene.background = new THREE.Color(0xffffff)
   scene.fog = new THREE.Fog(0xffffff, 0, 750)
 
-  const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75)
-  light.position.set(0.5, 1, 0.75)
-  scene.add(light)
+  const sun = new THREE.PointLight(0xffffff, 1.425)
+  sun.position.set(0, 2, 0)
+  scene.add(sun)
 
   // Callback: once init corrdinates set
   const createWorldObjects = () => {
@@ -123,8 +125,12 @@ function start(stream) {
     scene.add(northCube)
 
     const worldCube = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial()
+      new THREE.PlaneBufferGeometry(3, 5, 10, 10),
+      new THREE.MeshStandardMaterial({
+        transparent: true,
+        depthWrite: false,
+        map: new THREE.TextureLoader().load(pinSrc),
+      })
     )
     Array.from({ length: MAX_CUBES }).forEach(() => {
       const cube = worldCube.clone()
@@ -137,7 +143,8 @@ function start(stream) {
       scene.add(label)
       labels.push(label)
 
-      // object.lookAt(camera.position)
+      lookAtCamera(object, camera)
+      // lookAtCamera(label, camera)
       label.lookAt(camera.position)
     })
 
@@ -186,16 +193,16 @@ function start(stream) {
     objects.forEach((cube, index) => {
       // Get cube label
       const cubeLabel = labels[index]
-
       // Get new distance
       const newDistance = Math.floor(cube.position.distanceTo(camera.position))
-
       // Dipose label
       scene.remove(cubeLabel)
       cubeLabel.dispose()
 
       // Create new label
       const newLabel = createCubeLabel(cube.position, newDistance)
+
+      // lookAtCamera(newLabel, camera)
       newLabel.lookAt(camera.position)
 
       // Add new label to scene

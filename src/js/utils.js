@@ -55,3 +55,10 @@ export const calculateDistanceBetweenPoints = (start, end) => {
   const distance = TURF.distance(from, to, { units: 'meters' })
   return distance
 }
+
+export const lookAtCamera = (object, camera) => {
+  object.rotation.y = Math.atan2(
+    camera.position.x - object.position.x,
+    camera.position.z - object.position.z
+  )
+}

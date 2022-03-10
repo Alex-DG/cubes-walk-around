@@ -1,8 +1,5 @@
 import * as THREE from "three";
-
-// Import the objects you need.
-import { Gyroscope, AbsoluteOrientationSensor } from "motion-sensors-polyfill";
-
+import { radToDeg } from "three/src/math/MathUtils";
 import { isIOS } from "./utils";
 
 class DeviceOrientationControls {
@@ -136,6 +133,7 @@ class DeviceOrientationControls {
     const event = this.deviceOrientation;
 
     if (event) {
+      //This is just a hacky way of triggering the scene calibration
       if (!this.calibrated) this.calibrateScene();
 
       headingDegrees = this.getTrueHeading(event);
@@ -225,7 +223,7 @@ class DeviceOrientationControls {
       if (event.webkitCompassAccuracy < 50) {
         headingDegrees = event.webkitCompassHeading;
       } else
-        console.warn("webkitCompassAccuracy is event.webkitCompassAccuracy");
+        console.warn(`webkitCompassAccuracy is ${event.webkitCompassAccuracy}`);
     } else if (event.alpha !== null) {
       if (event.absolute === true || event.absolute === undefined) {
         headingDegrees = this.computeCompassHeading(
@@ -267,7 +265,8 @@ class DeviceOrientationControls {
     }
 
     // Convert radians to degrees
-    compassHeading *= this.RAD2DEG;
+    // compassHeading *= this.RAD2DEG;
+    compassHeading = radToDeg(compassHeading);
 
     return compassHeading;
   }

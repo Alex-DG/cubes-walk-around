@@ -131,7 +131,7 @@ class DeviceOrientationControls {
 
     let headingDegrees = 0;
     const event = this.deviceOrientation;
-
+    console.log({ event })
     if (event) {
       //This is just a hacky way of triggering the scene calibration
       if (!this.calibrated) this.calibrateScene();
